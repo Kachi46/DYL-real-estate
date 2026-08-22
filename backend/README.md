@@ -8,10 +8,8 @@ running and pointed at the right URL.
 ## Quick start
 
 You need a Postgres database to point this at — a local install, Docker, or
-a free hosted instance (Neon, Supabase, Railway, etc all work). If you're
-deploying through Netlify with a linked Netlify DB, skip `DATABASE_URL` and
-run everything through `netlify dev` instead — it injects its own connection
-automatically.
+a free hosted instance (Neon, Vercel Postgres, Supabase, Railway, etc all
+work).
 
 ```bash
 npm install
@@ -23,6 +21,25 @@ npm start                  # → http://localhost:4000
 
 Leave this running in its own terminal — the frontend(s) call out to it for
 every request.
+
+## Deploying on Vercel
+
+This is already set up for it: `vercel.json` routes every request to
+`api/index.js`, which just exports the same Express app used locally (Vercel
+invokes it directly, no wrapper needed).
+
+1. Provision a Postgres database (Vercel Postgres, Neon, Supabase, etc.) and
+   grab its connection string.
+2. In the Vercel project settings for this repo, set the **Root Directory**
+   to `backend/`, and add these Environment Variables: `DATABASE_URL`,
+   `JWT_SECRET`, `JWT_EXPIRES_IN`, `CLIENT_ORIGIN`, `ADMIN_ORIGIN` (set the
+   last two to your deployed frontend URLs, once you have them, to lock
+   CORS down).
+3. Run `npm run migrate` once against that same `DATABASE_URL` (from your
+   own machine, with it set in your local `.env`) to create the schema —
+   Vercel doesn't run this for you automatically.
+4. Deploy. Your API will be live at `https://<your-project>.vercel.app/api/...`.
+5. Point your frontend(s) at that URL (see `js/config.js` in each site).
 
 ## Default accounts (after `npm run seed`)
 
@@ -69,15 +86,14 @@ lines in `.env` and set them to your actual frontend URLs to lock it down.
 ## Data
 
 Postgres, pointed at by `DATABASE_URL` in `.env`. `npm run migrate` applies
-everything in `netlify/database/migrations/` and tracks what's already been
+everything in `database/migrations/` and tracks what's already been
 applied (safe to re-run). To reset everything, drop and recreate the
 database, then run `npm run migrate` and `npm run seed` again.
 
 ## Troubleshooting
 
 - **`MissingDatabaseConnectionError` on startup** — `DATABASE_URL` isn't set
-  in `.env`, or points at a database that isn't reachable. Not running
-  through `netlify dev`? You need `DATABASE_URL` set explicitly.
+  in `.env`, or points at a database that isn't reachable.
 - **"Failed to fetch" / CORS error in the browser console** — the backend
   isn't running, or `CLIENT_ORIGIN`/`ADMIN_ORIGIN` are set in `.env` and
   don't match the origin your frontend is actually served from. Comment

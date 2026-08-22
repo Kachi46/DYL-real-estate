@@ -68,5 +68,6 @@ if (require.main === module) {
   });
 }
 
-// Netlify
+// Exported for Vercel's serverless runtime (see api/index.js) and for
+// requiring in tests. Local dev runs it via the app.listen() block above.
 module.exports = app;

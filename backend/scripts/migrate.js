@@ -20,7 +20,6 @@ if (!connectionString) {
 const MIGRATIONS_DIR = path.join(
   __dirname,
   "..",
-  "netlify",
   "database",
   "migrations"
 );

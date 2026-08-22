@@ -11,7 +11,6 @@
     "seed": "node seed.js"
   },
   "dependencies": {
-    "@netlify/aws-lambda-compat": "^1.0.2",
     "@netlify/database": "^1.1.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -20,7 +19,6 @@
     "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "pg": "^8.23.0",
-    "serverless-http": "^4.0.0"
+    "pg": "^8.23.0"
   }
 }
