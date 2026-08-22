@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="seal.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+  <title>Browse Listings — DYL Real Estate Services</title>
+</head>
+<body>
+  <div id="navbar-root" class="navbar"></div>
+
+  <main class="container">
+    <h1 class="page-title">Browse listings</h1>
+
+    <div class="filter-bar">
+      <input type="text" id="f-q" placeholder="Search title, city, state…" />
+      <select id="f-state">
+        <option value="">All states</option>
+        <option>Lagos</option>
+        <option>Abuja</option>
+        <option>Ogun</option>
+        <option>Oyo</option>
+        <option>Rivers</option>
+      </select>
+      <select id="f-type">
+        <option value="">All types</option>
+        <option value="land">Land</option>
+        <option value="residential">Residential</option>
+        <option value="commercial">Commercial</option>
+      </select>
+      <select id="f-listing">
+        <option value="">Sale &amp; rent</option>
+        <option value="sale">For sale</option>
+        <option value="rent">For rent</option>
+      </select>
+      <select id="f-min-price">
+        <option value="">Min price</option>
+        <option value="1000000">₦1M</option>
+        <option value="5000000">₦5M</option>
+        <option value="10000000">₦10M</option>
+        <option value="25000000">₦25M</option>
+        <option value="50000000">₦50M</option>
+        <option value="100000000">₦100M</option>
+      </select>
+      <select id="f-max-price">
+        <option value="">Max price</option>
+        <option value="5000000">₦5M</option>
+        <option value="15000000">₦15M</option>
+        <option value="30000000">₦30M</option>
+        <option value="75000000">₦75M</option>
+        <option value="150000000">₦150M</option>
+        <option value="500000000">₦500M+</option>
+      </select>
+      <label class="filter-checkbox">
+        <input type="checkbox" id="f-verified" /> Verified only
+      </label>
+    </div>
+
+    <div id="results">
+      <p class="loading-text">Loading listings…</p>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+  </main>
+
+  <footer class="footer" id="footer-root"></footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/connection-check.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/listings.js"></script>
+</body>
+</html>

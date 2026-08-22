@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="DYL Real Estate Services — Nigeria's verified property platform. Search verified land and residential listings with authenticated title documents." />
+  <link rel="icon" type="image/svg+xml" href="seal.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+  <title>DYL Real Estate Services — Verified Real Estate</title>
+</head>
+
+<body>
+  <div id="navbar-root" class="navbar"></div>
+
+  <main>
+    <section class="hero">
+      <div class="hero-bg"><img src="https://images.unsplash.com/photo-1449844908441-8829872d2607?w=1600" alt="" />
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="eyebrow">Title-verified, before you view</p>
+        <h1>Property in Nigeria, without the title-fraud gamble.</h1>
+        <p>
+          Every seal on DYL Real Estate Services means our team has checked the land title
+          document against the seller's claim. Search verified land, homes,
+          and commercial property across Lagos and beyond.
+        </p>
+
+        <div class="search-box-wrapper">
+          <div class="search-tabs" id="hero-search-tabs">
+            <button type="button" class="search-tab-btn active" data-listing-type="">All Properties</button>
+            <button type="button" class="search-tab-btn" data-listing-type="sale">For Sale</button>
+            <button type="button" class="search-tab-btn" data-listing-type="rent">For Rent</button>
+          </div>
+
+          <form class="search-form" id="home-search-form">
+            <input type="hidden" id="home-search-listing-type" value="" />
+
+            <div class="search-form-grid">
+              <input type="text" id="home-search-q" placeholder="Search area, city or keyword (e.g. Lekki, Yaba…)" />
+
+              <select id="home-search-state">
+                <option value="">All States</option>
+                <option value="Lagos">Lagos</option>
+                <option value="Abuja">Abuja</option>
+                <option value="Ogun">Ogun</option>
+                <option value="Oyo">Oyo</option>
+                <option value="Rivers">Rivers</option>
+              </select>
+
+              <select id="home-search-type">
+                <option value="">All Property Types</option>
+                <option value="residential">Residential</option>
+                <option value="land">Land &amp; Plots</option>
+                <option value="commercial">Commercial</option>
+              </select>
+            </div>
+
+            <div class="search-form-grid search-form-row-2">
+              <select id="home-search-min-price">
+                <option value="">Min Price (Any)</option>
+                <option value="1000000">₦1,000,000</option>
+                <option value="5000000">₦5,000,000</option>
+                <option value="10000000">₦10,000,000</option>
+                <option value="25000000">₦25,000,000</option>
+                <option value="50000000">₦50,000,000</option>
+                <option value="100000000">₦100,000,000</option>
+              </select>
+
+              <select id="home-search-max-price">
+                <option value="">Max Price (Any)</option>
+                <option value="5000000">₦5,000,000</option>
+                <option value="15000000">₦15,000,000</option>
+                <option value="30000000">₦30,000,000</option>
+                <option value="75000000">₦75,000,000</option>
+                <option value="150000000">₦150,000,000</option>
+                <option value="500000000">₦500,000,000+</option>
+              </select>
+
+              <label class="filter-checkbox" style="height:100%; border:none; background:transparent;">
+                <input type="checkbox" id="home-search-verified" checked /> Verified Title Only
+              </label>
+
+              <button type="submit" class="btn btn-gold">Search Properties</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Property Category Grid -->
+    <section class="container category-section">
+      <div class="section-head">
+        <h2>Explore Property Types</h2>
+        <a href="listings.html">Browse all categories →</a>
+      </div>
+
+      <div class="category-grid">
+        <a href="listings.html?property_type=residential" class="category-card">
+          <div class="category-icon">🏠</div>
+          <h3 class="category-title">Residential</h3>
+          <p class="category-count">Houses &amp; Apartments</p>
+        </a>
+
+        <a href="listings.html?property_type=land" class="category-card">
+          <div class="category-icon">🏞️</div>
+          <h3 class="category-title">Land &amp; Plots</h3>
+          <p class="category-count">Verified Title Plots</p>
+        </a>
+
+        <a href="listings.html?property_type=commercial" class="category-card">
+          <div class="category-icon">🏢</div>
+          <h3 class="category-title">Commercial</h3>
+          <p class="category-count">Offices &amp; Retail</p>
+        </a>
+
+        <a href="listings.html?listing_type=sale" class="category-card">
+          <div class="category-icon">🏷️</div>
+          <h3 class="category-title">For Sale</h3>
+          <p class="category-count">Outright Purchase</p>
+        </a>
+
+        <a href="listings.html?listing_type=rent" class="category-card">
+          <div class="category-icon">🔑</div>
+          <h3 class="category-title">For Rent</h3>
+          <p class="category-count">Leases &amp; Rentals</p>
+        </a>
+
+        <a href="listings.html?verified_only=true" class="category-card">
+          <div class="category-icon">🛡️</div>
+          <h3 class="category-title">Title Verified</h3>
+          <p class="category-count">100% Registry Checked</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Popular Locations Section -->
+    <section class="container locations-section">
+      <div class="section-head">
+        <h2>Popular Property Locations</h2>
+        <a href="listings.html">View all locations →</a>
+      </div>
+
+      <div class="location-grid">
+        <a href="listings.html?q=Lekki" class="location-card">
+          <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600" alt="Lekki, Lagos" />
+          <div class="location-overlay"></div>
+          <div class="location-info">
+            <h3 class="location-name">Lekki, Lagos</h3>
+            <p class="location-tag">Residential &amp; Commercial Prime Plots</p>
+          </div>
+        </a>
+
+        <a href="listings.html?q=Ikeja" class="location-card">
+          <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600" alt="Ikeja, Lagos" />
+          <div class="location-overlay"></div>
+          <div class="location-info">
+            <h3 class="location-name">Ikeja, Lagos</h3>
+            <p class="location-tag">Capital Commercial Hub &amp; Housing</p>
+          </div>
+        </a>
+
+        <a href="listings.html?q=Ikoyi" class="location-card">
+          <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600" alt="Ikoyi, Lagos" />
+          <div class="location-overlay"></div>
+          <div class="location-info">
+            <h3 class="location-name">Ikoyi, Lagos</h3>
+            <p class="location-tag">Luxury Apartments &amp; Land Titles</p>
+          </div>
+        </a>
+
+        <a href="listings.html?q=Abuja" class="location-card">
+          <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=600" alt="Abuja FCT" />
+          <div class="location-overlay"></div>
+          <div class="location-info">
+            <h3 class="location-name">Abuja (FCT)</h3>
+            <p class="location-tag">Federal Capital Territory Properties</p>
+          </div>
+        </a>
+
+        <a href="listings.html?q=Ogun" class="location-card">
+          <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600" alt="Ogun State" />
+          <div class="location-overlay"></div>
+          <div class="location-info">
+            <h3 class="location-name">Ogun State</h3>
+            <p class="location-tag">Industrial Lands &amp; New Estates</p>
+          </div>
+        </a>
+
+        <a href="listings.html?q=Rivers" class="location-card">
+          <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600" alt="Port Harcourt, Rivers" />
+          <div class="location-overlay"></div>
+          <div class="location-info">
+            <h3 class="location-name">Port Harcourt, Rivers</h3>
+            <p class="location-tag">Commercial &amp; Oil Hub Estates</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Real Estate Market Overview Component -->
+    <section class="container market-section" id="market-overview-section">
+      <div class="section-head">
+        <h2>Market Overview of Nigeria</h2>
+        <a href="listings.html">Property Index →</a>
+      </div>
+
+      <div class="market-grid">
+        <!-- Top Gainers Card -->
+        <div class="market-card">
+          <div class="market-header">
+            <div class="market-icon-gain">📈</div>
+            <div class="market-title-box">
+              <h3>Top Gainers</h3>
+              <span id="market-gainers-period"></span>
+            </div>
+          </div>
+
+          <div class="market-list" id="market-gainers-list">
+            <p class="loading-text">Loading market data…</p>
+          </div>
+        </div>
+
+        <!-- Top Losers / Value Deals Card -->
+        <div class="market-card">
+          <div class="market-header">
+            <div class="market-icon-loss">📉</div>
+            <div class="market-title-box">
+              <h3>Top Losers &amp; Value Deals</h3>
+              <span id="market-losers-period"></span>
+            </div>
+          </div>
+
+          <div class="market-list" id="market-losers-list">
+            <p class="loading-text">Loading market data…</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="steps">
+        <div class="step">
+          <p class="step-num">Step 1</p>
+          <h3>Document review</h3>
+          <p>Sellers submit the title document — C of O, Governor's Consent, or Deed — before a listing goes live.</p>
+        </div>
+        <div class="step">
+          <p class="step-num">Step 2</p>
+          <h3>Registry cross-check</h3>
+          <p>Our team cross-checks the document details against public land registry records where available.</p>
+        </div>
+        <div class="step">
+          <p class="step-num">Step 3</p>
+          <h3>Seal granted</h3>
+          <p>Listings that pass carry the DYL Real Estate Services seal. Anything still under review is clearly marked
+            pending.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="section-head">
+        <h2>Recently verified</h2>
+        <a href="listings.html?verified_only=true">View all →</a>
+      </div>
+      <div class="property-grid" id="featured-grid">
+        <p class="loading-text">Loading…</p>
+      </div>
+    </section>
+
+    <!-- Homes with Videos Section -->
+    <section class="container video-homes-section">
+      <div class="section-head">
+        <h2>Homes with Videos</h2>
+        <a href="listings.html">Watch video tours →</a>
+      </div>
+
+      <div class="video-homes-grid">
+        <!-- Video Card 1 -->
+        <div class="video-home-card">
+          <div class="video-thumb-wrapper" data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+            data-title="Newly Built 5 Bedroom Duplex - Chevron Lekki">
+            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600"
+              alt="5 Bedroom Duplex Lekki" />
+            <div class="play-badge-icon">
+              <div class="play-triangle"></div>
+            </div>
+            <div class="video-dot-indicators">
+              <div class="dot-indicator active"></div>
+              <div class="dot-indicator"></div>
+            </div>
+          </div>
+          <div class="video-card-content">
+            <p class="video-card-tag">NEWLY BUILT 5BEDROOM DUPLEX LAGOS NIGERIA</p>
+            <p class="video-card-price">₦ 570,000,000</p>
+            <p class="video-card-loc">Chevron Lekki Lagos (5OBGG)</p>
+          </div>
+        </div>
+
+        <!-- Video Card 2 -->
+        <div class="video-home-card">
+          <div class="video-thumb-wrapper" data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+            data-title="Luxury 5 Bedroom Detached Villa - Chevron Lekki">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600"
+              alt="5 Bedroom Villa Chevron" />
+            <div class="play-badge-icon">
+              <div class="play-triangle"></div>
+            </div>
+            <div class="video-dot-indicators">
+              <div class="dot-indicator active"></div>
+              <div class="dot-indicator"></div>
+            </div>
+          </div>
+          <div class="video-card-content">
+            <p class="video-card-tag">NEWLY BUILT 5BEDROOM DUPLEX LAGOS NIGERIA</p>
+            <p class="video-card-price">₦ 570,000,000</p>
+            <p class="video-card-loc">Chevron Lekki Lagos (3OBGG)</p>
+          </div>
+        </div>
+
+        <!-- Video Card 3 -->
+        <div class="video-home-card">
+          <div class="video-thumb-wrapper" data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+            data-title="Contemporary 5 Bedroom Duplex - Chevron Lekki">
+            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600"
+              alt="Contemporary Duplex Chevron" />
+            <div class="play-badge-icon">
+              <div class="play-triangle"></div>
+            </div>
+            <div class="video-dot-indicators">
+              <div class="dot-indicator active"></div>
+              <div class="dot-indicator"></div>
+            </div>
+          </div>
+          <div class="video-card-content">
+            <p class="video-card-tag">NEWLY BUILT 5BEDROOM DUPLEX LAGOS NIGERIA</p>
+            <p class="video-card-price">₦ 570,000,000</p>
+            <p class="video-card-loc">Chevron Lekki Lagos (4OBGG)</p>
+          </div>
+        </div>
+
+        <!-- Video Card 4 -->
+        <div class="video-home-card">
+          <div class="video-thumb-wrapper" data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+            data-title="Executive 5 Bedroom Mansion - Chevron Alternative Route">
+            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600"
+              alt="Mansion Chevron Alternative" />
+            <div class="play-badge-icon">
+              <div class="play-triangle"></div>
+            </div>
+            <div class="video-dot-indicators">
+              <div class="dot-indicator active"></div>
+              <div class="dot-indicator"></div>
+            </div>
+          </div>
+          <div class="video-card-content">
+            <p class="video-card-tag">NEWLY BUILT 5BEDROOM DUPLEX LAGOS NIGERIA</p>
+            <p class="video-card-price">₦ 870,000,000</p>
+            <p class="video-card-loc">Chevron Alternative Route Lekki Lagos (8OBGE)</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Video Modal Lightbox Container -->
+    <div class="video-modal-backdrop" id="video-tour-modal">
+      <div class="video-modal-container">
+        <button type="button" class="video-modal-close" id="close-video-modal">&times;</button>
+        <div class="video-player-wrapper" id="video-player-frame"></div>
+      </div>
+    </div>
+
+    <!-- Post Property CTA Banner -->
+    <section class="container">
+      <div class="cta-banner">
+        <div class="cta-text">
+          <h2>Have land or property to sell or rent?</h2>
+          <p>List your property on DYL Real Estate Services to get verified, gain buyer trust, and close deals faster
+            across Nigeria.</p>
+        </div>
+        <a href="dashboard.html" class="btn btn-gold" style="white-space:nowrap;">Post a Property Free →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" id="footer-root"></footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/connection-check.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/home.js"></script>
+</body>
+
+</html>

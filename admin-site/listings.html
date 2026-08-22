@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="seal.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+  <title>Listings — DYL Real Estate Services Admin</title>
+</head>
+<body data-page="listings">
+  <div class="admin-shell">
+    <aside class="sidebar" id="sidebar-root"></aside>
+    <main class="admin-main">
+      <div class="admin-toolbar">
+        <h1>Listings</h1>
+        <select id="status-filter">
+          <option value="">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="verified">Verified</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div class="data-table-wrap" id="listings-table"><p class="loading-text" style="padding:1.5rem;">Loading…</p></div>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/connection-check.js"></script>
+  <script src="js/shell.js"></script>
+  <script src="js/listings.js"></script>
+</body>
+</html>

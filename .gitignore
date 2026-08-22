@@ -1,0 +1,21 @@
+# Dependencies
+**/node_modules/
+
+# Environment files (never commit real secrets/credentials)
+.env
+.env.local
+**/.env
+**/.env.local
+
+# Local Netlify state
+.netlify
+**/.netlify
+
+# Local SQLite/db artifacts, if any ever show up
+**/data/*.db
+**/data/*.db-*
+
+# OS/editor cruft
+.DS_Store
+*.log
+npm-debug.log*
