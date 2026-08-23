@@ -4,10 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { Pool } = require("pg");
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  process.env.NETLIFY_DATABASE_URL ||
-  process.env.NETLIFY_DB_URL;
+const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
   console.error(
