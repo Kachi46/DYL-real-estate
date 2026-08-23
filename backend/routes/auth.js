@@ -12,7 +12,7 @@ function signToken(user) {
     {
       id: user.id,
       role: user.role,
-      user_type: user.user_type || "seeker",
+      user_type: user.user_type,
       email: user.email,
       name: user.name,
     },
@@ -26,10 +26,41 @@ function publicUser(user) {
   return rest;
 }
 
+// Verifies a reCAPTCHA token against Google's siteverify endpoint. Returns
+// true (skips verification) when no RECAPTCHA_SECRET_KEY is configured,
+// so registration isn't blocked before that key exists - the moment it's
+// set as an env var, this starts actually enforcing it, with no other
+// code changes needed.
+async function verifyRecaptcha(token) {
+  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+
+  if (!secretKey) {
+    return true;
+  }
+
+  if (!token) {
+    return false;
+  }
+
+  const params = new URLSearchParams({ secret: secretKey, response: token });
+
+  const response = await fetch(
+    "https://www.google.com/recaptcha/api/siteverify",
+    { method: "POST", body: params }
+  );
+  const result = await response.json();
+
+  return Boolean(result.success);
+}
+
 router.post(
   "/register",
   [
-    body("name").trim().notEmpty().withMessage("Name is required."),
+    body("first_name")
+      .trim()
+      .notEmpty()
+      .withMessage("First name is required."),
+    body("last_name").trim().notEmpty().withMessage("Last name is required."),
     body("email")
       .isEmail()
       .withMessage("A valid email is required.")
@@ -37,6 +68,10 @@ router.post(
     body("password")
       .isLength({ min: 6 })
       .withMessage("Password must be at least 6 characters."),
+    body("user_type")
+      .optional()
+      .isIn(["user", "landlord", "agent", "developer"])
+      .withMessage("Invalid account type."),
   ],
   async (req, res, next) => {
     try {
@@ -46,7 +81,24 @@ router.post(
         return res.status(400).json({ error: errors.array()[0].msg });
       }
 
-      const { name, email, password, phone } = req.body;
+      const {
+        first_name,
+        last_name,
+        email,
+        password,
+        phone,
+        user_type,
+        email_opt_in,
+        recaptcha_token,
+      } = req.body;
+
+      const captchaOk = await verifyRecaptcha(recaptcha_token);
+
+      if (!captchaOk) {
+        return res
+          .status(400)
+          .json({ error: "reCAPTCHA verification failed. Please try again." });
+      }
 
       const existing = await db.sql`
         SELECT id
@@ -62,19 +114,28 @@ router.post(
       }
 
       const hash = bcrypt.hashSync(password, 10);
+      const fullName = `${first_name} ${last_name}`.trim();
 
       const users = await db.sql`
         INSERT INTO users (
           name,
+          first_name,
+          last_name,
           email,
           password_hash,
-          phone
+          phone,
+          user_type,
+          email_opt_in
         )
         VALUES (
-          ${name},
+          ${fullName},
+          ${first_name},
+          ${last_name},
           ${email},
           ${hash},
-          ${phone || null}
+          ${phone || null},
+          ${user_type || "user"},
+          ${Boolean(email_opt_in)}
         )
         RETURNING *
       `;
@@ -86,12 +147,9 @@ router.post(
         token,
         user: publicUser(user),
       });
-} catch (err) {
-  console.error("REGISTER ERROR:", err);
-  console.error("REGISTER ERROR MESSAGE:", err.message);
-  console.error("REGISTER ERROR CAUSE:", err.cause);
-  next(err);
-}
+    } catch (err) {
+      next(err);
+    }
   }
 );
 

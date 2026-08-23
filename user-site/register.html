@@ -14,59 +14,115 @@
   <div id="navbar-root" class="navbar"></div>
 
   <main class="form-page" style="max-width:540px;">
-    <h1>Create your account</h1>
-    <p class="subtitle">Join Nigeria's title-verified real estate platform.</p>
+    <h1>Register for exclusive benefits</h1>
+    <p class="subtitle">Already have an account? <a href="login.html">Sign in</a></p>
 
     <div id="register-error"></div>
+
+    <div class="social-row">
+      <button type="button" class="btn-social" id="google-signin-btn" disabled title="Coming soon — Google sign-in needs API credentials to be configured first">
+        <svg class="social-icon" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6 29.6 4 24 4c-7.4 0-13.8 4.2-17 10.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.5-2.1 14.3-5.6l-6.6-5.6C29.6 34.6 27 35.5 24 35.5c-5.2 0-9.6-3.5-11.2-8.2l-6.6 5.1C9.9 39.6 16.4 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.3-4.1 5.8l6.6 5.6C41.6 36.7 44 30.8 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+        Google
+      </button>
+      <button type="button" class="btn-social" id="facebook-signin-btn" disabled title="Coming soon — Facebook sign-in needs API credentials to be configured first">
+        <svg class="social-icon" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.7 4.53-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.89v2.26h3.32l-.53 3.49h-2.79V24C19.61 23.1 24 18.1 24 12.07z"/></svg>
+        Facebook
+      </button>
+    </div>
+    <p class="social-coming-soon" style="text-align:center;margin-top:-1rem;margin-bottom:1.5rem;">Social sign-in is coming soon — use email for now.</p>
+
+    <div class="divider-row"><span>or continue with your email</span></div>
+
     <form id="register-form">
+      <div class="field-row">
+        <label class="field">
+          First name
+          <input required id="reg-first-name" placeholder="First name" />
+        </label>
+        <label class="field">
+          Last name
+          <input required id="reg-last-name" placeholder="Last name" />
+        </label>
+      </div>
+
+      <label class="field">
+        Email address
+        <input required type="email" id="reg-email" placeholder="name@example.com" />
+      </label>
+
+      <div class="field-row phone-row">
+        <label class="field">
+          Country code
+          <select id="reg-country-code">
+            <option value="+234" selected>Nigeria (+234)</option>
+            <option value="+233">Ghana (+233)</option>
+            <option value="+254">Kenya (+254)</option>
+            <option value="+27">South Africa (+27)</option>
+            <option value="+1">USA/Canada (+1)</option>
+            <option value="+44">UK (+44)</option>
+          </select>
+        </label>
+        <label class="field">
+          Phone number (digits only)
+          <input id="reg-phone" inputmode="numeric" placeholder="8012345678" />
+        </label>
+      </div>
+
       <div style="margin-bottom:1.25rem;">
-        <label class="field" style="margin-bottom:0.5rem;font-weight:600;">Select Account Type</label>
-        <input type="hidden" id="reg-user-type" value="seeker" />
-        
+        <label class="field" style="margin-bottom:0.5rem;">Account type</label>
+        <input type="hidden" id="reg-user-type" value="user" />
+
         <div class="user-type-selector" id="user-type-cards">
-          <div class="user-type-card active" data-type="seeker">
-            <div class="user-type-icon">🔍</div>
-            <div class="user-type-name">Property Seeker</div>
-          </div>
-
-          <div class="user-type-card" data-type="landlord">
-            <div class="user-type-icon">🏠</div>
-            <div class="user-type-name">Landlord</div>
-          </div>
-
           <div class="user-type-card" data-type="agent">
             <div class="user-type-icon">💼</div>
             <div class="user-type-name">Agent</div>
           </div>
-
           <div class="user-type-card" data-type="developer">
             <div class="user-type-icon">🏗️</div>
             <div class="user-type-name">Developer</div>
+          </div>
+          <div class="user-type-card" data-type="landlord">
+            <div class="user-type-icon">🏠</div>
+            <div class="user-type-name">Landlord</div>
+          </div>
+          <div class="user-type-card active" data-type="user">
+            <div class="user-type-icon">🔍</div>
+            <div class="user-type-name">User</div>
           </div>
         </div>
       </div>
 
       <label class="field">
-        Full name
-        <input required id="reg-name" placeholder="e.g. Somto Chukwu" />
+        Create password
+        <div class="password-field-wrap">
+          <input required type="password" minlength="6" id="reg-password" placeholder="Password" />
+          <button type="button" class="password-toggle" id="password-toggle-btn">Show</button>
+        </div>
       </label>
-      <label class="field">
-        Email
-        <input required type="email" id="reg-email" placeholder="name@example.com" />
-      </label>
-      <label class="field">
-        Phone (optional)
-        <input id="reg-phone" placeholder="e.g. 08012345678" />
-      </label>
-      <label class="field">
-        Password
-        <input required type="password" minlength="6" id="reg-password" placeholder="••••••••" />
-        <span class="hint">At least 6 characters.</span>
-      </label>
-      <button type="submit" class="btn btn-primary btn-block" id="register-submit">Create account</button>
-    </form>
+      <div class="password-requirement" id="password-req">
+        <span class="req-check">✓</span> 6 characters minimum
+      </div>
 
-    <p class="form-footer">Already have an account? <a href="login.html">Log in</a></p>
+      <div class="pref-block">
+        <p class="pref-title">Email preferences</p>
+        <p class="pref-copy">I agree to regular updates of property listings, real estate insights and new project developments from DYL Real Estate Services and our partners.</p>
+        <input type="hidden" id="reg-email-opt-in" value="false" />
+        <div class="pref-toggle-row">
+          <button type="button" class="pref-toggle active" data-value="false">No, thanks</button>
+          <button type="button" class="pref-toggle" data-value="true">Yes, please</button>
+        </div>
+        <p class="pref-note">You can unsubscribe or update your preferences at any time.</p>
+      </div>
+
+      <div class="captcha-box">
+        <span class="captcha-dot"></span>
+        reCAPTCHA verification will appear here once a site key is configured for this domain.
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" id="register-submit">Register</button>
+
+      <p class="terms-note">By registering you accept our <a href="terms.html">Terms of Use</a> and <a href="privacy.html">Privacy Policy.</a></p>
+    </form>
   </main>
 
   <footer class="footer" id="footer-root"></footer>
@@ -79,16 +135,46 @@
   <script>
     if (Api.getToken()) window.location.href = "dashboard.html";
 
-    // User Type selector cards interactive script
+    // Account type selector
     const typeCards = document.querySelectorAll("#user-type-cards .user-type-card");
     const userTypeInput = document.getElementById("reg-user-type");
-
-    typeCards.forEach(card => {
+    typeCards.forEach((card) => {
       card.addEventListener("click", () => {
-        typeCards.forEach(c => c.classList.remove("active"));
+        typeCards.forEach((c) => c.classList.remove("active"));
         card.classList.add("active");
         userTypeInput.value = card.dataset.type;
       });
+    });
+
+    // Password show/hide
+    const passwordInput = document.getElementById("reg-password");
+    const passwordToggleBtn = document.getElementById("password-toggle-btn");
+    passwordToggleBtn.addEventListener("click", () => {
+      const showing = passwordInput.type === "text";
+      passwordInput.type = showing ? "password" : "text";
+      passwordToggleBtn.textContent = showing ? "Show" : "Hide";
+    });
+
+    // Live "6 characters minimum" check
+    const passwordReq = document.getElementById("password-req");
+    passwordInput.addEventListener("input", () => {
+      passwordReq.classList.toggle("met", passwordInput.value.length >= 6);
+    });
+
+    // Email preferences toggle
+    const prefButtons = document.querySelectorAll(".pref-toggle");
+    const emailOptInInput = document.getElementById("reg-email-opt-in");
+    prefButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        prefButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        emailOptInInput.value = btn.dataset.value;
+      });
+    });
+
+    // Phone: digits only
+    document.getElementById("reg-phone").addEventListener("input", (e) => {
+      e.target.value = e.target.value.replace(/\D/g, "");
     });
 
     document.getElementById("register-form").addEventListener("submit", async (e) => {
@@ -98,20 +184,29 @@
       errorEl.innerHTML = "";
       submitBtn.disabled = true;
       submitBtn.textContent = "Creating account…";
+
+      const countryCode = document.getElementById("reg-country-code").value;
+      const phoneDigits = document.getElementById("reg-phone").value.trim();
+
       try {
         const res = await Api.post("/auth/register", {
-          name: document.getElementById("reg-name").value,
+          first_name: document.getElementById("reg-first-name").value,
+          last_name: document.getElementById("reg-last-name").value,
           email: document.getElementById("reg-email").value,
-          phone: document.getElementById("reg-phone").value,
-          password: document.getElementById("reg-password").value,
+          phone: phoneDigits ? `${countryCode}${phoneDigits}` : "",
+          password: passwordInput.value,
           user_type: userTypeInput.value,
+          email_opt_in: emailOptInInput.value === "true",
+          // Populated automatically by Google's widget once RECAPTCHA_SITE_KEY
+          // is configured (see js/config.js) - harmless empty value until then.
+          recaptcha_token: window.grecaptchaToken || null,
         });
         Api.setToken(res.token);
         window.location.href = "dashboard.html";
       } catch (err) {
         errorEl.innerHTML = `<p class="alert alert-error">${Util.escapeHtml(err.message)}</p>`;
         submitBtn.disabled = false;
-        submitBtn.textContent = "Create account";
+        submitBtn.textContent = "Register";
       }
     });
   </script>
