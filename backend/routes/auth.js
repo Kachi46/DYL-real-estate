@@ -26,31 +26,74 @@ function publicUser(user) {
   return rest;
 }
 
-// Verifies a reCAPTCHA token against Google's siteverify endpoint. Returns
-// true (skips verification) when no RECAPTCHA_SECRET_KEY is configured,
-// so registration isn't blocked before that key exists - the moment it's
-// set as an env var, this starts actually enforcing it, with no other
-// code changes needed.
-async function verifyRecaptcha(token) {
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-
-  if (!secretKey) {
-    return true;
-  }
-
-  if (!token) {
-    return false;
-  }
-
-  const params = new URLSearchParams({ secret: secretKey, response: token });
+// Verifies a Google ID token by asking Google directly whether it's valid,
+// rather than doing JWT signature verification ourselves - simpler, and it
+// means Google's key rotation is never our problem. Confirms both that the
+// token is genuinely Google's AND that it was issued for *this* app
+// (the `aud` check) - without that second check, a token from a
+// completely different Google app would be accepted.
+async function verifyGoogleIdToken(idToken) {
+  if (!idToken) return null;
 
   const response = await fetch(
-    "https://www.google.com/recaptcha/api/siteverify",
-    { method: "POST", body: params }
+    `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`
   );
-  const result = await response.json();
 
-  return Boolean(result.success);
+  if (!response.ok) return null;
+
+  const payload = await response.json();
+
+  if (payload.aud !== process.env.GOOGLE_CLIENT_ID) return null;
+  if (payload.email_verified !== "true" && payload.email_verified !== true) {
+    return null;
+  }
+
+  return {
+    google_id: payload.sub,
+    email: payload.email,
+    name: payload.name || payload.email.split("@")[0],
+  };
+}
+
+// Finds the user this verified Google profile belongs to, linking it to an
+// existing email/password account on first Google sign-in, or creating a
+// brand new account if the email has never been seen before. Kept separate
+// from verifyGoogleIdToken so the database logic can be tested directly
+// with a trusted payload, independent of the network call to Google.
+async function findOrCreateGoogleUser({ google_id, email, name }) {
+  const byGoogleId = await db.sql`
+    SELECT * FROM users WHERE google_id = ${google_id} LIMIT 1
+  `;
+  if (byGoogleId.length > 0) return byGoogleId[0];
+
+  const byEmail = await db.sql`
+    SELECT * FROM users WHERE email = ${email} LIMIT 1
+  `;
+
+  if (byEmail.length > 0) {
+    // Existing email/password account signing in with Google for the
+    // first time - link it rather than creating a duplicate account.
+    const linked = await db.sql`
+      UPDATE users SET google_id = ${google_id}
+      WHERE id = ${byEmail[0].id}
+      RETURNING *
+    `;
+    return linked[0];
+  }
+
+  const [first_name, ...rest] = name.split(" ");
+  const last_name = rest.join(" ") || first_name;
+
+  const created = await db.sql`
+    INSERT INTO users (
+      name, first_name, last_name, email, google_id, user_type
+    )
+    VALUES (
+      ${name}, ${first_name}, ${last_name}, ${email}, ${google_id}, ${"user"}
+    )
+    RETURNING *
+  `;
+  return created[0];
 }
 
 router.post(
@@ -89,16 +132,7 @@ router.post(
         phone,
         user_type,
         email_opt_in,
-        recaptcha_token,
       } = req.body;
-
-      const captchaOk = await verifyRecaptcha(recaptcha_token);
-
-      if (!captchaOk) {
-        return res
-          .status(400)
-          .json({ error: "reCAPTCHA verification failed. Please try again." });
-      }
 
       const existing = await db.sql`
         SELECT id
@@ -181,7 +215,11 @@ router.post(
 
       const user = users[0];
 
-      if (!user || !bcrypt.compareSync(password, user.password_hash)) {
+      if (
+        !user ||
+        !user.password_hash ||
+        !bcrypt.compareSync(password, user.password_hash)
+      ) {
         return res
           .status(401)
           .json({ error: "Invalid email or password." });
@@ -198,6 +236,34 @@ router.post(
     }
   }
 );
+
+router.post("/google", async (req, res, next) => {
+  try {
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      return res.status(503).json({
+        error: "Google sign-in isn't configured on this server yet.",
+      });
+    }
+
+    const profile = await verifyGoogleIdToken(req.body.credential);
+
+    if (!profile) {
+      return res
+        .status(401)
+        .json({ error: "Could not verify that Google sign-in." });
+    }
+
+    const user = await findOrCreateGoogleUser(profile);
+    const token = signToken(user);
+
+    return res.json({
+      token,
+      user: publicUser(user),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.get("/me", authenticate, async (req, res, next) => {
   try {
@@ -223,3 +289,4 @@ router.get("/me", authenticate, async (req, res, next) => {
 });
 
 module.exports = router;
+module.exports._findOrCreateGoogleUser = findOrCreateGoogleUser;
