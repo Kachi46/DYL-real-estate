@@ -54,15 +54,19 @@ function renderListView() {
 }
 
 async function handleAction(action, post) {
-  if (action === "edit") {
-    renderEditorView(post);
-  } else if (action === "toggle") {
-    await Api.put(`/admin/posts/${post.id}`, { published: !post.published });
-    loadPosts();
-  } else if (action === "delete") {
-    if (!window.confirm(`Delete "${post.title}" permanently?`)) return;
-    await Api.del(`/admin/posts/${post.id}`);
-    loadPosts();
+  try {
+    if (action === "edit") {
+      renderEditorView(post);
+    } else if (action === "toggle") {
+      await Api.put(`/admin/posts/${post.id}`, { published: !post.published });
+      loadPosts();
+    } else if (action === "delete") {
+      if (!window.confirm(`Delete "${post.title}" permanently?`)) return;
+      await Api.del(`/admin/posts/${post.id}`);
+      loadPosts();
+    }
+  } catch (err) {
+    window.alert(err.message || "That action couldn't be completed.");
   }
 }
 

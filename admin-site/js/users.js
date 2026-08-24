@@ -51,16 +51,24 @@ async function handleAction(btn) {
     }
     const nextRole = btn.dataset.role === "admin" ? "user" : "admin";
     if (!window.confirm(`Change ${name}'s role to "${nextRole}"?`)) return;
-    await Api.patch(`/admin/users/${id}/role`, { role: nextRole });
-    loadUsers();
+    try {
+      await Api.patch(`/admin/users/${id}/role`, { role: nextRole });
+      loadUsers();
+    } catch (err) {
+      window.alert(err.message || "Couldn't update that user's role.");
+    }
   } else if (action === "delete") {
     if (window.currentAdmin && id === window.currentAdmin.id) {
       window.alert("You can't delete your own account while logged in.");
       return;
     }
     if (!window.confirm(`Delete ${name}'s account permanently?`)) return;
-    await Api.del(`/admin/users/${id}`);
-    loadUsers();
+    try {
+      await Api.del(`/admin/users/${id}`);
+      loadUsers();
+    } catch (err) {
+      window.alert(err.message || "Couldn't delete that account.");
+    }
   }
 }
 

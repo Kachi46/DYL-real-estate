@@ -304,6 +304,47 @@ router.delete("/users/:id", async (req, res, next) => {
         .json({ error: "User not found." });
     }
 
+    // properties.owner_id and posts.author_id are both ON DELETE CASCADE,
+    // so deleting this user would silently wipe every listing they own
+    // (verified/live ones included, plus their inquiries, saved-bookmark
+    // entries, and price history) and every post they've authored. That's
+    // real content, not throwaway account data - block the delete rather
+    // than let it cascade invisibly, and tell the admin what to do instead.
+    const [ownedProperties, authoredPosts] = await Promise.all([
+      db.sql`
+        SELECT COUNT(*)::int AS count
+        FROM properties
+        WHERE owner_id = ${req.params.id}
+      `,
+      db.sql`
+        SELECT COUNT(*)::int AS count
+        FROM posts
+        WHERE author_id = ${req.params.id}
+      `,
+    ]);
+
+    const propertyCount = ownedProperties[0]?.count || 0;
+    const postCount = authoredPosts[0]?.count || 0;
+
+    if (propertyCount > 0 || postCount > 0) {
+      const parts = [];
+      if (propertyCount > 0) {
+        parts.push(
+          `${propertyCount} listing${propertyCount === 1 ? "" : "s"}`
+        );
+      }
+      if (postCount > 0) {
+        parts.push(`${postCount} blog post${postCount === 1 ? "" : "s"}`);
+      }
+
+      return res.status(409).json({
+        error:
+          `This account still owns ${parts.join(" and ")}. ` +
+          "Reassign or remove that content first - deleting the " +
+          "account would delete it too.",
+      });
+    }
+
     await db.sql`
       DELETE FROM users
       WHERE id = ${req.params.id}

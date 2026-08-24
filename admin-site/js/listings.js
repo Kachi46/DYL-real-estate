@@ -74,21 +74,25 @@ function renderTable(properties) {
 }
 
 async function handleAction(action, id) {
-  if (action === "verify") {
-    await Api.patch(`/admin/properties/${id}/verify`, { verification_status: "verified" });
-    loadListings();
-  } else if (action === "reject") {
-    rejectingId = rejectingId === id ? null : id;
-    loadListings();
-  } else if (action === "confirm-reject") {
-    const notes = document.getElementById(`reject-notes-${id}`).value;
-    await Api.patch(`/admin/properties/${id}/verify`, { verification_status: "rejected", verification_notes: notes });
-    rejectingId = null;
-    loadListings();
-  } else if (action === "delete") {
-    if (!window.confirm("Delete this listing permanently? This cannot be undone.")) return;
-    await Api.del(`/properties/${id}`);
-    loadListings();
+  try {
+    if (action === "verify") {
+      await Api.patch(`/admin/properties/${id}/verify`, { verification_status: "verified" });
+      loadListings();
+    } else if (action === "reject") {
+      rejectingId = rejectingId === id ? null : id;
+      loadListings();
+    } else if (action === "confirm-reject") {
+      const notes = document.getElementById(`reject-notes-${id}`).value;
+      await Api.patch(`/admin/properties/${id}/verify`, { verification_status: "rejected", verification_notes: notes });
+      rejectingId = null;
+      loadListings();
+    } else if (action === "delete") {
+      if (!window.confirm("Delete this listing permanently? This cannot be undone.")) return;
+      await Api.del(`/properties/${id}`);
+      loadListings();
+    }
+  } catch (err) {
+    window.alert(err.message || "That action couldn't be completed.");
   }
 }
 
