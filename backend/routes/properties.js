@@ -44,6 +44,13 @@ router.get("/", async (req, res, next) => {
 
     const conditions = [
       db.sql`status = ${"active"}`,
+      // Rejected listings must never appear in public search results - the
+      // whole premise of this platform is that what's shown has been
+      // reviewed, so an explicitly-flagged listing (e.g. fake title
+      // document) staying visible here would undermine that. Pending
+      // listings are fine to show (normal newly-submitted state); only
+      // rejected is excluded by default.
+      db.sql`verification_status != ${"rejected"}`,
     ];
 
     if (q) {
@@ -227,8 +234,12 @@ router.get("/market/movers", async (req, res, next) => {
 
 // GET /api/properties/:id
 // Public detail view
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", optionalAuth, async (req, res, next) => {
   try {
+    if (!/^\d+$/.test(req.params.id)) {
+      return res.status(400).json({ error: "Invalid property ID." });
+    }
+
     const rows = await db.sql`
       SELECT *
       FROM properties
@@ -239,6 +250,19 @@ router.get("/:id", async (req, res, next) => {
     const row = rows[0];
 
     if (!row) {
+      return res
+        .status(404)
+        .json({ error: "Property not found." });
+    }
+
+    const isOwnerOrAdmin =
+      req.user &&
+      (req.user.id === row.owner_id || req.user.role === "admin");
+
+    // Same reasoning as the list endpoint above - a rejected listing
+    // shouldn't be reachable by a direct link either, except to the
+    // person who needs to see why (its owner) or an admin.
+    if (row.verification_status === "rejected" && !isOwnerOrAdmin) {
       return res
         .status(404)
         .json({ error: "Property not found." });
@@ -380,6 +404,10 @@ router.post(
 // Update - owner or admin only
 router.put("/:id", authenticate, async (req, res, next) => {
   try {
+    if (!/^\d+$/.test(req.params.id)) {
+      return res.status(400).json({ error: "Invalid property ID." });
+    }
+
     const existingRows = await db.sql`
       SELECT *
       FROM properties
@@ -526,6 +554,10 @@ router.put("/:id", authenticate, async (req, res, next) => {
 // Owner or admin only
 router.delete("/:id", authenticate, async (req, res, next) => {
   try {
+    if (!/^\d+$/.test(req.params.id)) {
+      return res.status(400).json({ error: "Invalid property ID." });
+    }
+
     const existingRows = await db.sql`
       SELECT *
       FROM properties

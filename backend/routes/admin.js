@@ -59,7 +59,6 @@ router.get("/stats", async (req, res, next) => {
       db.sql`
         SELECT COUNT(*)::int AS count
         FROM users
-        WHERE role = ${"user"}
       `,
       db.sql`
         SELECT COUNT(*)::int AS count
@@ -135,6 +134,10 @@ router.patch(
   ],
   async (req, res, next) => {
     try {
+      if (!/^\d+$/.test(req.params.id)) {
+        return res.status(400).json({ error: "Invalid property ID." });
+      }
+
       const errors = validationResult(req);
 
       if (!errors.isEmpty()) {
@@ -194,9 +197,14 @@ router.get("/users", async (req, res, next) => {
       SELECT
         id,
         name,
+        first_name,
+        last_name,
         email,
         role,
+        user_type,
         phone,
+        email_opt_in,
+        (google_id IS NOT NULL) AS has_google_login,
         created_at
       FROM users
       ORDER BY created_at DESC
@@ -223,6 +231,10 @@ router.patch(
         return res
           .status(400)
           .json({ error: errors.array()[0].msg });
+      }
+
+      if (!/^\d+$/.test(req.params.id)) {
+        return res.status(400).json({ error: "Invalid user ID." });
       }
 
       // Mirrors the self-delete guard below: without this, an admin can
@@ -267,6 +279,10 @@ router.patch(
 // DELETE /api/admin/users/:id
 router.delete("/users/:id", async (req, res, next) => {
   try {
+    if (!/^\d+$/.test(req.params.id)) {
+      return res.status(400).json({ error: "Invalid user ID." });
+    }
+
     // The frontend blocks this too, but that's advisory only - the API
     // must not rely on the client to enforce it.
     if (Number(req.params.id) === Number(req.user.id)) {

@@ -15,6 +15,7 @@ function renderUsers(users) {
       <td class="row-title">${Util.escapeHtml(u.name)}</td>
       <td>${Util.escapeHtml(u.email)}</td>
       <td>${u.phone ? Util.escapeHtml(u.phone) : "—"}</td>
+      <td>${u.user_type ? Util.escapeHtml(u.user_type) : "—"}</td>
       <td>${Util.statusPill(u.role)}</td>
       <td>${new Date(u.created_at).toLocaleDateString()}</td>
       <td class="actions">
@@ -28,7 +29,7 @@ function renderUsers(users) {
 
   table.innerHTML = `
     <table class="data-table">
-      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th><th></th></tr></thead>
+      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Account type</th><th>Role</th><th>Joined</th><th></th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   `;
