@@ -321,6 +321,10 @@ router.get("/inquiries", async (req, res, next) => {
   try {
     const { property_id } = req.query;
 
+    if (property_id !== undefined && !/^\d+$/.test(property_id)) {
+      return res.status(400).json({ error: "Invalid property ID." });
+    }
+
     let rows;
 
     if (property_id) {

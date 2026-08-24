@@ -598,6 +598,10 @@ router.delete("/:id", authenticate, async (req, res, next) => {
 // Save/unsave a listing
 router.post("/:id/save", authenticate, async (req, res, next) => {
   try {
+    if (!/^\d+$/.test(req.params.id)) {
+      return res.status(400).json({ error: "Invalid property ID." });
+    }
+
     const propertyRows = await db.sql`
       SELECT id
       FROM properties
@@ -702,6 +706,10 @@ router.post(
   ],
   async (req, res, next) => {
     try {
+      if (!/^\d+$/.test(req.params.id)) {
+        return res.status(400).json({ error: "Invalid property ID." });
+      }
+
       const errors = validationResult(req);
 
       if (!errors.isEmpty()) {
