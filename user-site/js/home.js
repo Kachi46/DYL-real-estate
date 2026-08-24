@@ -34,36 +34,51 @@ document.getElementById("home-search-form")?.addEventListener("submit", (e) => {
   window.location.href = "listings.html?" + params.toString();
 });
 
-// Interactive Video Tour Modal Lightbox
-const videoModal = document.getElementById("video-tour-modal");
-const videoFrame = document.getElementById("video-player-frame");
-const closeVideoBtn = document.getElementById("close-video-modal");
-const videoCards = document.querySelectorAll(".video-thumb-wrapper");
+// "Homes with Videos" — pulls real listings that have a YouTube video
+// attached and links straight out to YouTube for each one, so the view
+// happens on YouTube itself rather than in an embedded player on this site.
+async function loadVideoHomes() {
+  const grid = document.getElementById("video-homes-grid");
+  if (!grid) return;
 
-videoCards.forEach((card) => {
-  card.addEventListener("click", () => {
-    const videoUrl = card.dataset.videoUrl;
-    if (videoModal && videoFrame) {
-      videoFrame.innerHTML = `<iframe src="${videoUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-      videoModal.classList.add("active");
+  try {
+    const res = await Api.get("/properties", {
+      has_video: "true",
+      verified_only: "true",
+      limit: 4,
+    });
+
+    if (res.data.length === 0) {
+      grid.innerHTML = `<p class="loading-text">No video tours yet — check back soon.</p>`;
+      return;
     }
-  });
-});
 
-if (closeVideoBtn) {
-  closeVideoBtn.addEventListener("click", closeVideoPlayer);
+    grid.innerHTML = res.data.map(videoHomeCardHtml).join("");
+  } catch (err) {
+    grid.innerHTML = `<p class="loading-text">Couldn't load video tours right now.</p>`;
+  }
 }
 
-if (videoModal) {
-  videoModal.addEventListener("click", (e) => {
-    if (e.target === videoModal) closeVideoPlayer();
-  });
+function videoHomeCardHtml(p) {
+  return `
+    <a class="video-home-card" href="${p.youtube_watch_url}" target="_blank" rel="noopener noreferrer">
+      <div class="video-thumb-wrapper">
+        <img src="${p.youtube_thumbnail_url}" alt="${Util.escapeHtml(p.title)}" loading="lazy" />
+        <div class="play-badge-icon">
+          <div class="play-triangle"></div>
+        </div>
+        <span class="video-youtube-badge">▶ Watch on YouTube</span>
+      </div>
+      <div class="video-card-content">
+        <p class="video-card-tag">${Util.escapeHtml(p.title.toUpperCase())}</p>
+        <p class="video-card-price">${Util.formatPrice(p.price, p.currency, p.listing_type)}</p>
+        <p class="video-card-loc">${Util.escapeHtml(p.city)}, ${Util.escapeHtml(p.state)}</p>
+      </div>
+    </a>
+  `;
 }
 
-function closeVideoPlayer() {
-  if (videoModal) videoModal.classList.remove("active");
-  if (videoFrame) videoFrame.innerHTML = "";
-}
+loadVideoHomes();
 
 async function loadFeatured() {
   const grid = document.getElementById("featured-grid");

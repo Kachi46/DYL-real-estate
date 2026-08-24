@@ -2,6 +2,7 @@ const express = require("express");
 const { body, validationResult } = require("express-validator");
 const db = require("../db");
 const { authenticate, optionalAuth } = require("../middleware/auth");
+const { extractYouTubeId } = require("../lib/youtube");
 
 const router = express.Router();
 
@@ -12,6 +13,14 @@ function parseProperty(row) {
       typeof row.images === "string"
         ? JSON.parse(row.images || "[]")
         : row.images || [],
+    // Convenience fields so the frontend never has to build these itself -
+    // both point at YouTube's own domains, not anything hosted by us.
+    youtube_watch_url: row.video_id
+      ? `https://www.youtube.com/watch?v=${row.video_id}`
+      : null,
+    youtube_thumbnail_url: row.video_id
+      ? `https://img.youtube.com/vi/${row.video_id}/hqdefault.jpg`
+      : null,
   };
 }
 
@@ -28,6 +37,7 @@ router.get("/", async (req, res, next) => {
       min_price,
       max_price,
       verified_only,
+      has_video,
       page = 1,
       limit = 12,
     } = req.query;
@@ -77,6 +87,10 @@ router.get("/", async (req, res, next) => {
       conditions.push(
         db.sql`verification_status = ${"verified"}`
       );
+    }
+
+    if (has_video === "true") {
+      conditions.push(db.sql`video_id IS NOT NULL`);
     }
 
     const whereClause = conditions.reduce(
@@ -257,6 +271,16 @@ router.post(
     body("price").isFloat({ min: 0 }),
     body("state").trim().notEmpty(),
     body("city").trim().notEmpty(),
+    body("video_url")
+      .optional({ checkFalsy: true })
+      .custom((value) => {
+        if (!extractYouTubeId(value)) {
+          throw new Error(
+            "That doesn't look like a valid YouTube link."
+          );
+        }
+        return true;
+      }),
   ],
   async (req, res, next) => {
     try {
@@ -283,7 +307,10 @@ router.post(
         bathrooms,
         images = [],
         title_document,
+        video_url,
       } = req.body;
+
+      const video_id = video_url ? extractYouTubeId(video_url) : null;
 
       const rows = await db.sql`
         INSERT INTO properties (
@@ -301,6 +328,7 @@ router.post(
           bathrooms,
           images,
           title_document,
+          video_id,
           owner_id
         )
         VALUES (
@@ -324,6 +352,7 @@ router.post(
             : null},
           ${JSON.stringify(images)},
           ${title_document || null},
+          ${video_id},
           ${req.user.id}
         )
         RETURNING *
@@ -409,6 +438,23 @@ router.put("/:id", authenticate, async (req, res, next) => {
         field: "images",
         value: JSON.stringify(req.body.images),
       });
+    }
+
+    if (req.body.video_url !== undefined) {
+      if (req.body.video_url === "" || req.body.video_url === null) {
+        // Explicitly clearing the video.
+        updates.push({ field: "video_id", value: null });
+      } else {
+        const video_id = extractYouTubeId(req.body.video_url);
+
+        if (!video_id) {
+          return res.status(400).json({
+            error: "That doesn't look like a valid YouTube link.",
+          });
+        }
+
+        updates.push({ field: "video_id", value: video_id });
+      }
     }
 
     if (req.user.role !== "admin") {

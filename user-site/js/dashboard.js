@@ -139,6 +139,11 @@ function renderAddForm() {
         Title document type (e.g. Certificate of Occupancy, Deed of Assignment)
         <input id="l-title-doc" />
       </label>
+      <label class="field col-span-full">
+        YouTube video tour link (optional)
+        <input id="l-video-url" placeholder="https://youtube.com/watch?v=… or https://youtu.be/…" />
+        <span class="hint">Paste a link to a video tour you've uploaded to YouTube. Visitors will be sent to YouTube to watch it.</span>
+      </label>
       <button type="submit" class="btn btn-primary col-span-full" id="listing-submit">Submit listing for review</button>
     </form>
   `;
@@ -174,6 +179,7 @@ function renderAddForm() {
         ? document.getElementById("l-images").value.split(",").map((s) => s.trim()).filter(Boolean)
         : [],
       title_document: document.getElementById("l-title-doc").value || undefined,
+      video_url: document.getElementById("l-video-url").value.trim() || undefined,
     };
 
     try {
