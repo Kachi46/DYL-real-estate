@@ -96,6 +96,47 @@ server (not just read — actually run):
 - [x] Backend deliberately stopped → every page still loads (it's just files) and the connection-check banner script/CSS are present and correctly reference the live health endpoint
 - [x] Backend running → the exact URL the banner check calls (`/api/health`) returns 200, so no banner appears, and login/CORS still work
 
+## Pointing the frontend at a real backend URL
+
+Both `user-site/` and `admin-site/` are plain static HTML/JS — there's no
+build step, so there's no real `.env` file the way there is for `backend/`.
+Instead, each site has a `js/env.js` file (loaded before everything else)
+that sets a couple of global variables `js/config.js` reads:
+
+```js
+// user-site/js/env.js or admin-site/js/env.js
+window.VERI_ESTATE_API_URL = ""; // e.g. "https://your-backend.vercel.app/api"
+```
+
+- **Local dev (Live Server, or double-clicking the HTML file):** leave it
+  blank. It falls back to `http://localhost:4000/api` automatically.
+- **Deployed anywhere real** (GitHub Pages, Vercel, Netlify, S3, etc.): the
+  backend has to be deployed *somewhere with a public URL* first (see
+  `backend/README.md` — it's already set up for Vercel). Once you have
+  that URL, set it in `js/env.js` in **both** sites before deploying the
+  frontend. Without this step, a hosted frontend will try to call
+  `localhost:4000` from every visitor's own browser, which doesn't exist
+  for them — that's the most common reason a deployed site shows the red
+  "can't reach the backend" banner.
+
+## Hosting the static sites on GitHub Pages
+
+GitHub Pages only serves static files — it can't run the Node/Postgres
+backend, so this covers `user-site/` and `admin-site/` only. Deploy the
+backend separately first (see `backend/README.md`), then:
+
+1. Set `VERI_ESTATE_API_URL` in `js/env.js` in the site(s) you're
+   deploying to your live backend's URL (step above).
+2. In your GitHub repo settings → **Pages**, set the source branch and, if
+   your repo has both `user-site/` and `admin-site/` at the root, point it
+   at whichever folder you're publishing (GitHub Pages can only serve one
+   folder per site — publish `user-site/` and `admin-site/` as two
+   separate Pages sites, or two separate repos, if you want both live).
+3. Once it's live, also set `CLIENT_ORIGIN` / `ADMIN_ORIGIN` in your
+   backend's environment variables to your new `*.github.io` URL(s), so
+   CORS allows requests from it (see "Why CORS won't get in your way"
+   above — the default wide-open CORS is meant for local dev only).
+
 ## If something doesn't work
 
 **You don't need the browser console for this anymore.** Every page now
@@ -106,11 +147,12 @@ itself instead of something you have to go dig for.
 - **Red banner: "Can't reach the backend server..."** → the backend isn't
   running, or isn't running on the URL the frontend expects. Check the
   terminal from step 1 is still alive and shows `VeriEstate API running on
-  http://localhost:4000`. If you changed the port, update `VERI_ESTATE_API_URL`
-  in `js/config.js` in both `user-site` and `admin-site` to match.
+  http://localhost:4000`. If you changed the port, update
+  `VERI_ESTATE_API_URL` in `js/env.js` in both `user-site` and `admin-site`
+  to match.
 - **No banner, but login still fails** → this is a real auth error (wrong
   password, etc.) — it'll show inline on the login form itself.
 - **Port 4000 in use** → change `PORT=` in `backend/.env`, then update
-  `js/config.js` in both sites to match.
+  `js/env.js` in both sites to match.
 - **Want to reset all data** → stop the server, delete
   `backend/data/veriestate.db*`, run `npm run seed` again.
