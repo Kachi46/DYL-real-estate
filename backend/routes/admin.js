@@ -512,6 +512,10 @@ router.put(
   ],
   async (req, res, next) => {
     try {
+      if (!/^\d+$/.test(req.params.id)) {
+        return res.status(400).json({ error: "Invalid post ID." });
+      }
+
       const errors = validationResult(req);
 
       if (!errors.isEmpty()) {
@@ -624,6 +628,10 @@ router.delete(
   "/posts/:id",
   async (req, res, next) => {
     try {
+      if (!/^\d+$/.test(req.params.id)) {
+        return res.status(400).json({ error: "Invalid post ID." });
+      }
+
       const existingRows = await db.sql`
         SELECT id
         FROM posts
