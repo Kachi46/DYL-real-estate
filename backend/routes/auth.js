@@ -1,11 +1,43 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 const { body, validationResult } = require("express-validator");
 const db = require("../db");
 const { authenticate } = require("../middleware/auth");
 
 const router = express.Router();
+
+const mailer = process.env.SMTP_HOST
+  ? nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 587),
+      secure: process.env.SMTP_SECURE === "true",
+      auth: process.env.SMTP_USER
+        ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD }
+        : undefined,
+    })
+  : null;
+
+function hashResetToken(token) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+async function sendResetEmail(email, resetUrl) {
+  if (!mailer) {
+    console.log(`Password reset link for ${email}: ${resetUrl}`);
+    return;
+  }
+
+  await mailer.sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to: email,
+    subject: "Reset your DYL Real Estate Services password",
+    text: `Reset your password using this link. It expires in one hour:\n\n${resetUrl}`,
+    html: `<p>Reset your password using the link below. It expires in one hour.</p><p><a href="${resetUrl}">Reset password</a></p>`,
+  });
+}
 
 function signToken(user) {
   return jwt.sign(
@@ -231,6 +263,92 @@ router.post(
         token,
         user: publicUser(user),
       });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.post(
+  "/change-password",
+  authenticate,
+  [
+    body("current_password").notEmpty().withMessage("Current password is required."),
+    body("new_password")
+      .isLength({ min: 6 })
+      .withMessage("New password must be at least 6 characters."),
+  ],
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
+
+      const users = await db.sql`SELECT * FROM users WHERE id = ${req.user.id} LIMIT 1`;
+      const user = users[0];
+      if (!user || !user.password_hash || !bcrypt.compareSync(req.body.current_password, user.password_hash)) {
+        return res.status(401).json({ error: "Current password is incorrect." });
+      }
+
+      await db.sql`
+        UPDATE users SET password_hash = ${bcrypt.hashSync(req.body.new_password, 10)}
+        WHERE id = ${req.user.id}
+      `;
+      return res.json({ message: "Password updated successfully." });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.post(
+  "/forgot-password",
+  [body("email").isEmail().withMessage("A valid email is required.").normalizeEmail()],
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
+
+      const users = await db.sql`SELECT id, email FROM users WHERE email = ${req.body.email} LIMIT 1`;
+      if (users.length > 0) {
+        const token = crypto.randomBytes(32).toString("hex");
+        await db.sql`DELETE FROM password_reset_tokens WHERE user_id = ${users[0].id} OR expires_at < NOW()`;
+        await db.sql`
+          INSERT INTO password_reset_tokens (user_id, token_hash, expires_at)
+          VALUES (${users[0].id}, ${hashResetToken(token)}, NOW() + INTERVAL '1 hour')
+        `;
+        const resetBase = process.env.CLIENT_ORIGIN || "http://localhost:5500/user-site";
+        await sendResetEmail(users[0].email, `${resetBase.replace(/\/$/, "")}/reset-password.html?token=${token}`);
+      }
+
+      return res.json({ message: "If an account exists for that email, a reset link has been sent." });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.post(
+  "/reset-password",
+  [
+    body("token").trim().notEmpty().withMessage("Reset token is required."),
+    body("new_password").isLength({ min: 6 }).withMessage("New password must be at least 6 characters."),
+  ],
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
+
+      const claimed = await db.sql`
+        UPDATE password_reset_tokens
+        SET used_at = NOW()
+        WHERE token_hash = ${hashResetToken(req.body.token)}
+          AND used_at IS NULL AND expires_at > NOW()
+        RETURNING user_id
+      `;
+      if (claimed.length === 0) return res.status(400).json({ error: "This reset link is invalid or expired." });
+
+      await db.sql`UPDATE users SET password_hash = ${bcrypt.hashSync(req.body.new_password, 10)} WHERE id = ${claimed[0].user_id}`;
+      return res.json({ message: "Password reset successfully." });
     } catch (err) {
       next(err);
     }

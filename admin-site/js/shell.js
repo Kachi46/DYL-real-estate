@@ -3,6 +3,7 @@ const NAV_ITEMS = [
   { href: "listings.html", label: "Listings", match: "listings" },
   { href: "posts.html", label: "Blog", match: "posts" },
   { href: "users.html", label: "Users", match: "users" },
+  { href: "profile.html", label: "Edit Profile", match: "profile" },
 ];
 
 function renderSidebar(admin) {

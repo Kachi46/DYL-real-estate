@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="seal.svg" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <title>Edit Profile — DYL Real Estate Services Admin</title>
+</head>
+<body data-page="profile">
+  <div class="admin-shell">
+    <aside class="sidebar" id="sidebar-root"></aside>
+    <main class="admin-main">
+      <h1>Edit Profile</h1>
+      <p class="admin-sub">Update the password for your administrator account.</p>
+      <section class="sidebar-card" style="max-width:520px; margin-top:1.5rem;">
+        <div id="profile-message"></div>
+        <form id="password-form">
+          <label class="field">Current password<input required type="password" id="current-password" autocomplete="current-password" /></label>
+          <label class="field">New password<input required type="password" minlength="6" id="new-password" autocomplete="new-password" /></label>
+          <label class="field">Confirm new password<input required type="password" minlength="6" id="confirm-password" autocomplete="new-password" /></label>
+          <button type="submit" class="btn btn-primary" id="password-submit">Update password</button>
+        </form>
+      </section>
+    </main>
+  </div>
+  <script src="js/env.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/connection-check.js"></script>
+  <script src="js/shell.js"></script>
+  <script>
+    document.getElementById("password-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const message = document.getElementById("profile-message");
+      const submit = document.getElementById("password-submit");
+      const newPassword = document.getElementById("new-password").value;
+      if (newPassword !== document.getElementById("confirm-password").value) {
+        message.innerHTML = '<p class="alert alert-error">New passwords do not match.</p>';
+        return;
+      }
+      message.innerHTML = "";
+      submit.disabled = true;
+      try {
+        const result = await Api.post("/auth/change-password", {
+          current_password: document.getElementById("current-password").value,
+          new_password: newPassword,
+        });
+        message.innerHTML = `<p class="alert alert-info">${Util.escapeHtml(result.message)}</p>`;
+        document.getElementById("password-form").reset();
+      } catch (err) {
+        message.innerHTML = `<p class="alert alert-error">${Util.escapeHtml(err.message)}</p>`;
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
