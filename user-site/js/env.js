@@ -12,7 +12,7 @@
 // /api suffix. Without this, the live site will try to call
 // http://localhost:4000/api from every visitor's browser, which does
 // not exist for them - that's why nothing loads.
-window.VERI_ESTATE_API_URL = ""; // e.g. "https://your-backend.vercel.app/api"
+window.VERI_ESTATE_API_URL = "https://dly-real-estate-backend.vercel.app/api"; // e.g. "https://your-backend.vercel.app/api"
 
 // Optional: only needed if you've set up "Sign in with Google" (see
 // backend/.env.example -> GOOGLE_CLIENT_ID). Leave blank to keep the
