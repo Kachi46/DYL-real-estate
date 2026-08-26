@@ -29,6 +29,17 @@ function renderNavbar() {
     <div class="mobile-menu" id="mobile-menu" hidden>
       <a href="trust.html">Trust and legal</a>
       <a href="index.html#about">About us</a>
+      <a href="services.html">Services</a>
+      <a href="listings.html">Properties / listings</a>
+      <a href="agents.html">Agent profile</a>
+      <a href="book-inspection.html">Book an inspection</a>
+      <a href="mortgage.html">Mortgage calculator</a>
+      <a href="faq.html">FAQ</a>
+      <a href="testimonials.html">Testimonials</a>
+      <a href="blog.html">Blog / market news</a>
+      <a href="terms.html">Terms and conditions</a>
+      <a href="privacy.html">Privacy policy</a>
+      <a href="contact.html">Contact us</a>
       <a href="mailto:admin@veriestate.com">Contact us by email</a>
       <a href="tel:+2348000000000">Call customer service</a>
       <a href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
@@ -117,6 +128,11 @@ function renderFooter() {
             <ul>
               <li><a href="index.html#steps">Verification Process</a></li>
               <li><a href="trust.html">Trust and legal</a></li>
+              <li><a href="about.html">About us</a></li>
+              <li><a href="services.html">Services</a></li>
+              <li><a href="contact.html">Contact us</a></li>
+              <li><a href="faq.html">FAQ</a></li>
+              <li><a href="mortgage.html">Mortgage calculator</a></li>
               <li><a href="dashboard.html">List Your Property</a></li>
               <li><a href="blog.html">Real Estate News</a></li>
               <li><a href="listings.html?verified_only=true">Verified Only</a></li>

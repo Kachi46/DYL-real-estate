@@ -803,6 +803,34 @@ button { font-family: inherit; cursor: pointer; }
 .legal-list { padding-left: 1.2rem; color: var(--forest-700); line-height: 1.8; }
 .legal-actions, .legal-links { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1rem; }
 .legal-links a { color: var(--gold-600); font-weight: 600; }
+.info-page { max-width: 860px; padding-top: 3.5rem; padding-bottom: 4.5rem; }
+.info-page h1 { max-width: 42rem; font-family: 'Fraunces', serif; font-size: 2.35rem; line-height: 1.2; color: var(--forest-900); margin: 0.5rem 0; }
+.info-lead { max-width: 44rem; color: var(--forest-600); line-height: 1.75; font-size: 1rem; }
+.info-section { border-top: 1px solid var(--line); margin-top: 2.25rem; padding-top: 1.5rem; }
+.info-section h2 { font-family: 'Fraunces', serif; color: var(--forest-900); font-size: 1.35rem; margin: 0 0 0.6rem; }
+.info-section p { color: var(--forest-700); line-height: 1.7; }
+.info-grid, .service-list, .contact-grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .info-grid, .service-list, .contact-grid { grid-template-columns: repeat(2, 1fr); } }
+.info-grid > div, .service-list article { padding: 1.1rem; border: 1px solid var(--line); background: #fff; border-radius: var(--radius-md); }
+.info-grid h3, .service-list h2 { margin-top: 0; color: var(--forest-900); font-family: 'Fraunces', serif; }
+.text-link { color: var(--gold-600); font-weight: 600; }
+.contact-grid > div { padding: 1.1rem; }
+.faq-list { margin-top: 2rem; max-width: 46rem; }
+.faq-list details { border-top: 1px solid var(--line); padding: 1rem 0; color: var(--forest-700); }
+.faq-list details:last-child { border-bottom: 1px solid var(--line); }
+.faq-list summary { cursor: pointer; color: var(--forest-900); font-weight: 600; }
+.faq-list p { line-height: 1.7; margin-bottom: 0; }
+.calculator-card, .agent-profile-panel { max-width: 46rem; margin-top: 2rem; padding: 1.25rem; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.calculator-form { display: grid; gap: 0.8rem; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .calculator-form { grid-template-columns: 1fr 1fr; } }
+.calculator-form .btn { grid-column: 1 / -1; justify-self: start; }
+.calculator-result { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
+.result-label, .result-note { color: var(--forest-500); font-size: 0.85rem; }
+.result-value { font-family: 'Fraunces', serif; color: var(--gold-600); font-size: 2rem; margin: 0.25rem 0; }
+.agent-profile-panel { display: flex; align-items: center; gap: 1rem; }
+.agent-profile-panel h2 { margin: 0; font-family: 'Fraunces', serif; color: var(--forest-900); }
+.agent-profile-panel p { color: var(--forest-600); }
+.agent-avatar-large { width: 4rem; height: 4rem; font-size: 1rem; }
 .navbar > .support-badge { position: static; display: flex; width: fit-content; margin: 0.1rem auto 0.45rem; }
 .support-badge { z-index: 50; align-items: center; gap: 0.45rem; background: #168c55; color: #fff; border-radius: 999px; padding: 0.7rem 0.95rem; font-size: 0.78rem; font-weight: 600; box-shadow: var(--shadow-md); }
 .navbar > .support-badge { padding: 0.35rem 0.65rem; font-size: 0.68rem; box-shadow: var(--shadow-sm); }
