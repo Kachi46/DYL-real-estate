@@ -59,15 +59,17 @@ async function seed() {
 
   const sampleProperties = [
     {
-      title: "2-Bedroom Terrace Duplex, Lekki Phase 1",
+      title: "2-Bedroom Terrace Duplex, New Haven",
       description:
         "A well-finished 2-bedroom terrace duplex in a serene, gated estate in Lekki Phase 1. Fitted kitchen, POP ceiling, and 24/7 estate security.",
       property_type: "residential",
       listing_type: "sale",
       price: 85000000,
-      state: "Lagos",
-      city: "Lekki",
-      address: "12 Admiralty Way, Lekki Phase 1",
+      state: "Enugu",
+      city: "New Haven",
+      address: "New Haven, Enugu",
+      latitude: 6.457,
+      longitude: 7.514,
       size_sqm: 220,
       bedrooms: 2,
       bathrooms: 3,
@@ -78,15 +80,17 @@ async function seed() {
     },
 
     {
-      title: "Dry Serviced Land, Sangotedo",
+      title: "Dry Serviced Land, Independence Layout",
       description:
         "600sqm of dry, gazetted land with a Governor's Consent title in a fast-developing part of Sangotedo. Fenced and gated, close to major access road.",
       property_type: "land",
       listing_type: "sale",
       price: 15000000,
-      state: "Lagos",
-      city: "Sangotedo",
-      address: "Off Abraham Adesanya, Sangotedo",
+      state: "Enugu",
+      city: "Independence Layout",
+      address: "Independence Layout, Enugu",
+      latitude: 6.43,
+      longitude: 7.51,
       size_sqm: 600,
       bedrooms: null,
       bathrooms: null,
@@ -97,15 +101,17 @@ async function seed() {
     },
 
     {
-      title: "3-Bedroom Flat for Rent, Yaba",
+      title: "3-Bedroom Flat for Rent, Enugu GRA",
       description:
         "Spacious 3-bedroom flat in the heart of Yaba, walking distance to major tech hubs. All rooms ensuite, ample parking space.",
       property_type: "residential",
       listing_type: "rent",
       price: 2500000,
-      state: "Lagos",
-      city: "Yaba",
-      address: "8 Herbert Macaulay Way, Yaba",
+      state: "Enugu",
+      city: "Enugu GRA",
+      address: "Enugu GRA, Enugu",
+      latitude: 6.441,
+      longitude: 7.493,
       size_sqm: 140,
       bedrooms: 3,
       bathrooms: 3,
@@ -116,15 +122,17 @@ async function seed() {
     },
 
     {
-      title: "Commercial Plot, Ajah Express",
+      title: "Commercial Plot, Trans-Ekulu",
       description:
         "1,000sqm commercial land right on the Lekki-Epe Expressway in Ajah, ideal for retail or office development. C of O in progress.",
       property_type: "commercial",
       listing_type: "sale",
       price: 45000000,
-      state: "Lagos",
-      city: "Ajah",
-      address: "Lekki-Epe Expressway, Ajah",
+      state: "Enugu",
+      city: "Trans-Ekulu",
+      address: "Trans-Ekulu, Enugu",
+      latitude: 6.469,
+      longitude: 7.531,
       size_sqm: 1000,
       bedrooms: null,
       bathrooms: null,
