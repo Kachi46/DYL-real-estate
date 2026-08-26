@@ -1,3 +1,5 @@
+.location-card-featured { min-height: 230px; border: 2px solid var(--gold-300); }
+@media (min-width: 640px) { .location-card-featured { grid-column: span 2; } }
 :root {
   /* Deep pine green — desaturated and darkened a shade versus the original
      for a more editorial, less "app-startup" feel. */
@@ -777,6 +779,12 @@ button { font-family: inherit; cursor: pointer; }
 .location-map-frame { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: var(--radius-lg); overflow: hidden; background: var(--forest-50); border: 1px solid var(--line); }
 .location-map-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
 .location-map-fallback { display: flex; align-items: center; justify-content: center; height: 100%; padding: 1rem; text-align: center; color: var(--forest-500); font-size: 0.85rem; }
+.location-map-empty { display: flex; align-items: center; justify-content: center; padding: 1rem; color: var(--forest-500); font-size: 0.8rem; }
+.seller-map-wrap { margin-top: -0.2rem; }
+.field-label { margin: 0 0 0.4rem; color: var(--forest-800); font-size: 0.85rem; font-weight: 500; }
+.support-badge { position: fixed; right: 1rem; bottom: 1rem; z-index: 50; display: inline-flex; align-items: center; gap: 0.45rem; background: #168c55; color: #fff; border-radius: 999px; padding: 0.7rem 0.95rem; font-size: 0.78rem; font-weight: 600; box-shadow: var(--shadow-md); }
+.support-badge:hover { background: #116d42; }
+.support-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #8dffbd; box-shadow: 0 0 0 3px rgba(141,255,189,0.18); }
 .verified-note { margin-top: 1.5rem; background: var(--forest-50); border-radius: var(--radius-md); padding: 1rem 1.15rem; font-size: 0.85rem; color: var(--forest-700); border-left: 2px solid var(--gold-400); }
 
 .sidebar-card { border: 1px solid var(--line); border-radius: var(--radius-lg); background: #fff; padding: 1.5rem; box-shadow: var(--shadow-sm); }
@@ -795,9 +803,12 @@ button { font-family: inherit; cursor: pointer; }
 .tab-btn.active { border-color: var(--gold-400); color: var(--forest-900); }
 .tab-panel { margin-top: 2rem; }
 
-.listing-form { display: grid; gap: 1.1rem; grid-template-columns: 1fr; border: 1px solid var(--line); background: #fff; border-radius: var(--radius-lg); padding: 1.6rem; box-shadow: var(--shadow-sm); }
+.listing-form { display: grid; gap: 0.8rem; grid-template-columns: 1fr; border: 1px solid var(--line); background: #fff; border-radius: var(--radius-lg); padding: 1.1rem; box-shadow: var(--shadow-sm); }
 @media (min-width: 640px) { .listing-form { grid-template-columns: 1fr 1fr; } }
 .listing-form .col-span-full { grid-column: 1 / -1; }
+.field-hint { margin: -0.65rem 0 0; color: var(--forest-500); font-size: 0.78rem; line-height: 1.45; }
+.listing-form input[id="l-images"] { max-width: 32rem; }
+.tab-panel .card-media { aspect-ratio: 16 / 9; }
 
 /* Popular Locations Component */
 .locations-section {

@@ -3,6 +3,14 @@ function statusFromUrl() {
 }
 
 let rejectingId = null;
+let viewingMapId = null;
+
+function mapUrlForProperty(property) {
+  const query = property.latitude != null && property.longitude != null
+    ? `${property.latitude},${property.longitude}`
+    : [property.address, property.city, property.state, "Nigeria"].filter(Boolean).join(", ");
+  return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=14&output=embed`;
+}
 
 async function loadListings() {
   const table = document.getElementById("listings-table");
@@ -39,6 +47,7 @@ function renderTable(properties) {
         <td class="actions">
           ${p.verification_status !== "verified" ? `<button class="pill-btn pill-btn-primary" data-action="verify" data-id="${p.id}">Verify</button>` : ""}
           ${p.verification_status !== "rejected" ? `<button class="pill-btn pill-btn-danger-outline" data-action="reject" data-id="${p.id}">Reject</button>` : ""}
+          <button class="pill-btn pill-btn-outline" data-action="map" data-id="${p.id}">${viewingMapId === p.id ? "Hide map" : "Map"}</button>
           <button class="pill-btn pill-btn-outline" data-action="delete" data-id="${p.id}">Delete</button>
         </td>
       </tr>
@@ -54,6 +63,12 @@ function renderTable(properties) {
           </td>
         </tr>
       `;
+    }
+    if (viewingMapId === p.id) {
+      html += `
+        <tr class="map-row">
+          <td colspan="6"><iframe class="admin-map-frame" src="${mapUrlForProperty(p)}" title="Map showing ${Util.escapeHtml(`${p.city}, ${p.state}`)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></td>
+        </tr>`;
     }
     return html;
   }).join("");
@@ -80,6 +95,9 @@ async function handleAction(action, id) {
       loadListings();
     } else if (action === "reject") {
       rejectingId = rejectingId === id ? null : id;
+      loadListings();
+    } else if (action === "map") {
+      viewingMapId = viewingMapId === id ? null : id;
       loadListings();
     } else if (action === "confirm-reject") {
       const notes = document.getElementById(`reject-notes-${id}`).value;

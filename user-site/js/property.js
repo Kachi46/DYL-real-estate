@@ -50,7 +50,9 @@ function mapEmbedHtml(p) {
     return `<div class="location-map-fallback">No location details available for this listing.</div>`;
   }
 
-  const query = encodeURIComponent(parts.join(", "));
+  const query = p.latitude != null && p.longitude != null
+    ? `${encodeURIComponent(p.latitude)},${encodeURIComponent(p.longitude)}`
+    : encodeURIComponent(parts.join(", "));
 
   return `<iframe
     src="https://maps.google.com/maps?q=${query}&z=14&output=embed"

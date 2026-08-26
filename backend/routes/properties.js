@@ -295,6 +295,8 @@ router.post(
     body("price").isFloat({ min: 0 }),
     body("state").trim().notEmpty(),
     body("city").trim().notEmpty(),
+    body("latitude").optional({ checkFalsy: true }).isFloat({ min: -90, max: 90 }),
+    body("longitude").optional({ checkFalsy: true }).isFloat({ min: -180, max: 180 }),
     body("video_url")
       .optional({ checkFalsy: true })
       .custom((value) => {
@@ -326,6 +328,8 @@ router.post(
         state,
         city,
         address,
+        latitude,
+        longitude,
         size_sqm,
         bedrooms,
         bathrooms,
@@ -347,6 +351,8 @@ router.post(
           state,
           city,
           address,
+          latitude,
+          longitude,
           size_sqm,
           bedrooms,
           bathrooms,
@@ -365,6 +371,8 @@ router.post(
           ${state},
           ${city},
           ${address || null},
+          ${latitude !== undefined && latitude !== null && latitude !== "" ? Number(latitude) : null},
+          ${longitude !== undefined && longitude !== null && longitude !== "" ? Number(longitude) : null},
           ${size_sqm !== undefined && size_sqm !== null
             ? Number(size_sqm)
             : null},
@@ -443,6 +451,8 @@ router.put("/:id", authenticate, async (req, res, next) => {
       "state",
       "city",
       "address",
+      "latitude",
+      "longitude",
       "size_sqm",
       "bedrooms",
       "bathrooms",

@@ -113,12 +113,25 @@ function renderAddForm() {
       </label>
       <label class="field">
         State
-        <input required id="l-state" value="Lagos" />
+        <input required id="l-state" value="Enugu" />
       </label>
       <label class="field">
         City
         <input required id="l-city" />
       </label>
+      <label class="field">
+        Latitude
+        <input type="number" step="any" min="-90" max="90" id="l-latitude" placeholder="e.g. 6.5244" />
+      </label>
+      <label class="field">
+        Longitude
+        <input type="number" step="any" min="-180" max="180" id="l-longitude" placeholder="e.g. 3.3792" />
+      </label>
+      <p class="field-hint col-span-full">Add the property's GPS coordinates for a more accurate map pin. You can copy them from Google Maps.</p>
+      <div class="seller-map-wrap col-span-full">
+        <p class="field-label">Location preview</p>
+        <div id="seller-map-preview" class="location-map-frame location-map-empty">Enter latitude and longitude to preview the map.</div>
+      </div>
       <label class="field col-span-full">
         Address (optional)
         <input id="l-address" />
@@ -172,6 +185,8 @@ function renderAddForm() {
       size_sqm: num("l-size"),
       state: document.getElementById("l-state").value,
       city: document.getElementById("l-city").value,
+      latitude: document.getElementById("l-latitude").value || undefined,
+      longitude: document.getElementById("l-longitude").value || undefined,
       address: document.getElementById("l-address").value || undefined,
       bedrooms: num("l-bedrooms"),
       bathrooms: num("l-bathrooms"),
@@ -195,6 +210,21 @@ function renderAddForm() {
       submitBtn.textContent = "Submit listing for review";
     }
   });
+
+  const updateSellerMap = () => {
+    const latitude = document.getElementById("l-latitude").value;
+    const longitude = document.getElementById("l-longitude").value;
+    const preview = document.getElementById("seller-map-preview");
+    if (!latitude || !longitude) {
+      preview.className = "location-map-frame location-map-empty";
+      preview.textContent = "Enter latitude and longitude to preview the map.";
+      return;
+    }
+    preview.className = "location-map-frame";
+    preview.innerHTML = `<iframe src="https://maps.google.com/maps?q=${encodeURIComponent(latitude)},${encodeURIComponent(longitude)}&z=14&output=embed" title="Seller location preview" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+  };
+  document.getElementById("l-latitude").addEventListener("input", updateSellerMap);
+  document.getElementById("l-longitude").addEventListener("input", updateSellerMap);
 }
 
 refreshData();

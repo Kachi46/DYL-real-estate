@@ -25,6 +25,7 @@ function renderNavbar() {
 
       <div class="nav-actions" id="nav-actions"></div>
     </div>
+    <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer"><span class="support-dot"></span> Online customer service</a>
   `;
 
   const actions = document.getElementById("nav-actions");

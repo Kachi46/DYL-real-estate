@@ -27,6 +27,7 @@ function renderSidebar(admin) {
       <p class="admin-email">${Util.escapeHtml(admin.email)}</p>
       <button id="admin-logout-btn">Log out</button>
     </div>
+    <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Online support</a>
   `;
 
   document.getElementById("admin-logout-btn").addEventListener("click", () => {

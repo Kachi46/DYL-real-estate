@@ -10,12 +10,14 @@ async function loadBlogList() {
   try {
     const res = await Api.get("/posts", { page });
     if (res.data.length === 0) {
+      pagination.innerHTML = "";
       results.innerHTML = `<p class="loading-text">No posts published yet — check back soon.</p>`;
       return;
     }
     results.innerHTML = `<div class="blog-grid">${res.data.map(Util.postCardHtml).join("")}</div>`;
 
     const { page: current, totalPages } = res.pagination;
+    pagination.innerHTML = "";
     if (totalPages > 1) {
       let html = "";
       for (let p = 1; p <= totalPages; p++) {
@@ -29,8 +31,10 @@ async function loadBlogList() {
       });
     }
   } catch (err) {
+    pagination.innerHTML = "";
     results.innerHTML = `<p class="loading-text">Couldn't load posts right now.</p>`;
   }
 }
 
 loadBlogList();
+setInterval(loadBlogList, 60000);
