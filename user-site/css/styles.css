@@ -88,7 +88,7 @@ button { font-family: inherit; cursor: pointer; }
 .mobile-menu { display: grid; gap: 0.1rem; max-width: 1152px; margin: 0 auto; padding: 0 1.5rem 0.75rem; }
 .mobile-menu a { padding: 0.55rem 0.7rem; border-radius: var(--radius-sm); color: var(--forest-700); font-size: 0.8rem; }
 .mobile-menu a:hover { background: var(--forest-50); }
-@media (min-width: 768px) { .menu-toggle, .mobile-menu { display: none; } }
+@media (min-width: 768px) { .mobile-menu { display: none; } }
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
   border-radius: var(--radius-md); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.01em;
