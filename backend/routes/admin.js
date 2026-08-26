@@ -391,6 +391,45 @@ router.get("/inquiries", async (req, res, next) => {
   }
 });
 
+// GET /api/admin/inspections
+router.get("/inspections", async (req, res, next) => {
+  try {
+    const rows = await db.sql`
+      SELECT b.*, p.title AS property_title, p.city, p.state
+      FROM inspection_bookings b
+      JOIN properties p ON p.id = b.property_id
+      ORDER BY b.inspection_date ASC, b.inspection_time ASC, b.created_at DESC
+    `;
+    return res.json({ data: rows });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PATCH /api/admin/inspections/:id
+router.patch(
+  "/inspections/:id",
+  [body("status").isIn(["pending", "confirmed", "cancelled"])],
+  async (req, res, next) => {
+    try {
+      if (!/^\d+$/.test(req.params.id)) return res.status(400).json({ error: "Invalid inspection ID." });
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
+      const rows = await db.sql`
+        UPDATE inspection_bookings
+        SET status = ${req.body.status}
+        WHERE id = ${req.params.id}
+        RETURNING *
+      `;
+      if (rows.length === 0) return res.status(404).json({ error: "Inspection request not found." });
+      return res.json({ data: rows[0] });
+    } catch (err) {
+      if (err.code === "23505") return res.status(409).json({ error: "That time is already booked for this property." });
+      next(err);
+    }
+  }
+);
+
 // --------------------------------------------------
 // Blog post management
 // --------------------------------------------------

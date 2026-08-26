@@ -776,4 +776,73 @@ router.post(
   }
 );
 
+// POST /api/properties/:id/inspections
+// Request an inspection slot for a listing
+router.post(
+  "/:id/inspections",
+  optionalAuth,
+  [
+    body("name").trim().notEmpty().withMessage("Name is required."),
+    body("email").isEmail().withMessage("A valid email is required."),
+    body("phone").trim().notEmpty().withMessage("Phone number is required."),
+    body("inspection_date").isISO8601().withMessage("Choose a valid inspection date."),
+    body("inspection_time").matches(/^([01]\d|2[0-3]):[0-5]\d$/).withMessage("Choose a valid inspection time."),
+    body("notes").optional().isString(),
+  ],
+  async (req, res, next) => {
+    try {
+      if (!/^\d+$/.test(req.params.id)) {
+        return res.status(400).json({ error: "Invalid property ID." });
+      }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
+
+      const propertyRows = await db.sql`
+        SELECT id, title, city, state
+        FROM properties
+        WHERE id = ${req.params.id} AND status = ${"active"}
+        LIMIT 1
+      `;
+      if (propertyRows.length === 0) return res.status(404).json({ error: "Property not found." });
+
+      const requestedDate = new Date(`${req.body.inspection_date}T${req.body.inspection_time}:00`);
+      if (Number.isNaN(requestedDate.getTime()) || requestedDate <= new Date()) {
+        return res.status(400).json({ error: "Inspection date and time must be in the future." });
+      }
+
+      const existing = await db.sql`
+        SELECT id FROM inspection_bookings
+        WHERE property_id = ${req.params.id}
+          AND inspection_date = ${req.body.inspection_date}
+          AND inspection_time = ${req.body.inspection_time}
+          AND status IN ('pending', 'confirmed')
+        LIMIT 1
+      `;
+      if (existing.length > 0) return res.status(409).json({ error: "That inspection slot is no longer available. Please choose another time." });
+
+      const rows = await db.sql`
+        INSERT INTO inspection_bookings (
+          property_id, user_id, name, email, phone,
+          inspection_date, inspection_time, notes
+        )
+        VALUES (
+          ${req.params.id}, ${req.user ? req.user.id : null},
+          ${req.body.name}, ${req.body.email}, ${req.body.phone},
+          ${req.body.inspection_date}, ${req.body.inspection_time}, ${req.body.notes || null}
+        )
+        RETURNING id, inspection_date, inspection_time, status
+      `;
+
+      return res.status(201).json({
+        data: { ...rows[0], property: propertyRows[0] },
+        message: "Inspection request submitted successfully.",
+      });
+    } catch (err) {
+      if (err.code === "23505") return res.status(409).json({ error: "That inspection slot is no longer available. Please choose another time." });
+      next(err);
+    }
+  }
+);
+
 module.exports = router;

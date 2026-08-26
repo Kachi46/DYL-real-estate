@@ -1,6 +1,7 @@
 const NAV_ITEMS = [
   { href: "index.html", label: "Dashboard", match: "dashboard" },
   { href: "listings.html", label: "Listings", match: "listings" },
+  { href: "inspections.html", label: "Inspections", match: "inspections" },
   { href: "posts.html", label: "Blog", match: "posts" },
   { href: "users.html", label: "Users", match: "users" },
   { href: "profile.html", label: "Edit Profile", match: "profile" },

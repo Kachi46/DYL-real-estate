@@ -82,6 +82,13 @@ button { font-family: inherit; cursor: pointer; }
 .nav-links a { font-size: 0.85rem; font-weight: 500; letter-spacing: 0.01em; color: var(--forest-600); transition: color .2s; }
 .nav-links a:hover { color: var(--gold-500); }
 .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+.menu-toggle { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 2.25rem; height: 2.25rem; border: 1px solid var(--line); border-radius: var(--radius-md); background: #fff; color: var(--forest-700); padding: 0.4rem; }
+.menu-toggle span { display: block; width: 1rem; height: 2px; border-radius: 2px; background: currentColor; }
+.menu-toggle:hover { border-color: var(--forest-400); background: var(--forest-50); }
+.mobile-menu { display: grid; gap: 0.1rem; max-width: 1152px; margin: 0 auto; padding: 0 1.5rem 0.75rem; }
+.mobile-menu a { padding: 0.55rem 0.7rem; border-radius: var(--radius-sm); color: var(--forest-700); font-size: 0.8rem; }
+.mobile-menu a:hover { background: var(--forest-50); }
+@media (min-width: 768px) { .menu-toggle, .mobile-menu { display: none; } }
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
   border-radius: var(--radius-md); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.01em;
@@ -782,8 +789,23 @@ button { font-family: inherit; cursor: pointer; }
 .location-map-empty { display: flex; align-items: center; justify-content: center; padding: 1rem; color: var(--forest-500); font-size: 0.8rem; }
 .seller-map-wrap { margin-top: -0.2rem; }
 .field-label { margin: 0 0 0.4rem; color: var(--forest-800); font-size: 0.85rem; font-weight: 500; }
-.navbar > .support-badge { position: static; display: flex; width: fit-content; margin: 0 auto 0.65rem; }
+.legal-page { max-width: 760px; padding-top: 3.5rem; padding-bottom: 4.5rem; }
+.legal-page h1 { font-family: 'Fraunces', serif; font-size: 2.35rem; color: var(--forest-900); margin: 0.5rem 0; }
+.legal-lead { max-width: 42rem; color: var(--forest-600); line-height: 1.7; font-size: 1rem; }
+.legal-section { border-top: 1px solid var(--line); margin-top: 2.25rem; padding-top: 1.5rem; }
+.legal-section h2 { font-family: 'Fraunces', serif; color: var(--forest-900); font-size: 1.35rem; margin: 0 0 0.6rem; }
+.legal-section p { color: var(--forest-700); line-height: 1.7; }
+.trust-grid { display: grid; gap: 1rem; margin-top: 1.25rem; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .trust-grid { grid-template-columns: repeat(3, 1fr); } }
+.trust-grid > div { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); padding: 1rem; }
+.trust-grid strong { color: var(--forest-900); }
+.trust-grid p { font-size: 0.85rem; margin-bottom: 0; }
+.legal-list { padding-left: 1.2rem; color: var(--forest-700); line-height: 1.8; }
+.legal-actions, .legal-links { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1rem; }
+.legal-links a { color: var(--gold-600); font-weight: 600; }
+.navbar > .support-badge { position: static; display: flex; width: fit-content; margin: 0.1rem auto 0.45rem; }
 .support-badge { z-index: 50; align-items: center; gap: 0.45rem; background: #168c55; color: #fff; border-radius: 999px; padding: 0.7rem 0.95rem; font-size: 0.78rem; font-weight: 600; box-shadow: var(--shadow-md); }
+.navbar > .support-badge { padding: 0.35rem 0.65rem; font-size: 0.68rem; box-shadow: var(--shadow-sm); }
 .support-badge:hover { background: #116d42; }
 .support-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #8dffbd; box-shadow: 0 0 0 3px rgba(141,255,189,0.18); }
 .verified-note { margin-top: 1.5rem; background: var(--forest-50); border-radius: var(--radius-md); padding: 1rem 1.15rem; font-size: 0.85rem; color: var(--forest-700); border-left: 2px solid var(--gold-400); }
@@ -793,6 +815,12 @@ button { font-family: inherit; cursor: pointer; }
 .inquiry-form { display: flex; flex-direction: column; gap: 0.65rem; }
 .inquiry-form input, .inquiry-form textarea { border: 1px solid var(--line); border-radius: var(--radius-md); padding: 0.6rem 0.8rem; font-size: 0.85rem; font-family: inherit; transition: border-color .15s ease; }
 .inquiry-form input:focus, .inquiry-form textarea:focus { outline: none; border-color: var(--forest-400); box-shadow: 0 0 0 3px var(--forest-100); }
+.booking-page { max-width: 760px; padding-top: 2.5rem; padding-bottom: 4rem; }
+.booking-back { color: var(--forest-500); font-size: 0.85rem; }
+.booking-page h1 { font-family: 'Fraunces', serif; color: var(--forest-900); font-size: 2.2rem; margin: 0.5rem 0; }
+.booking-lead { color: var(--forest-600); line-height: 1.7; max-width: 42rem; }
+.booking-form { margin-top: 2rem; max-width: 38rem; padding: 1.25rem; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.booking-success { max-width: 38rem; margin-top: 3rem; padding: 2rem 0; }
 
 /* Dashboard tabs */
 .tabs { display: flex; gap: 0.5rem; border-bottom: 1px solid var(--line); margin-top: 1.5rem; }

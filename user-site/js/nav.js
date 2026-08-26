@@ -24,9 +24,26 @@ function renderNavbar() {
       </nav>
 
       <div class="nav-actions" id="nav-actions"></div>
+      <button type="button" class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu"><span></span><span></span><span></span></button>
     </div>
-    <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer"><span class="support-dot"></span> Online customer service</a>
+    <div class="mobile-menu" id="mobile-menu" hidden>
+      <a href="trust.html">Trust and legal</a>
+      <a href="index.html#about">About us</a>
+      <a href="mailto:admin@veriestate.com">Contact us by email</a>
+      <a href="tel:+2348000000000">Call customer service</a>
+      <a href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+    </div>
+    <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer"><span class="support-dot"></span> Support</a>
   `;
+
+  const menuToggle = document.getElementById("menu-toggle");
+  const mobileMenu = document.getElementById("mobile-menu");
+  menuToggle.addEventListener("click", () => {
+    const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+    menuToggle.setAttribute("aria-expanded", String(!isOpen));
+    menuToggle.setAttribute("aria-label", isOpen ? "Open menu" : "Close menu");
+    mobileMenu.hidden = isOpen;
+  });
 
   const actions = document.getElementById("nav-actions");
 
@@ -99,6 +116,7 @@ function renderFooter() {
             <h4>Platform</h4>
             <ul>
               <li><a href="index.html#steps">Verification Process</a></li>
+              <li><a href="trust.html">Trust and legal</a></li>
               <li><a href="dashboard.html">List Your Property</a></li>
               <li><a href="blog.html">Real Estate News</a></li>
               <li><a href="listings.html?verified_only=true">Verified Only</a></li>

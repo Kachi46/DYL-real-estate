@@ -134,6 +134,7 @@ function render(p) {
               </div>
             </div>
             <div class="agent-actions">
+                <a href="book-inspection.html?id=${encodeURIComponent(p.id)}" class="btn btn-gold btn-block">Book an inspection</a>
               <a href="https://wa.me/2348000000000?text=${encodeURIComponent(`Hello DYL Real Estate, I am interested in property listing #${p.id}: "${p.title}" located in ${p.city}, ${p.state} priced at ${Util.formatPrice(p.price, p.currency, p.listing_type)}. Is it available for inspection?`)}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-block">
                 💬 Chat on WhatsApp
               </a>

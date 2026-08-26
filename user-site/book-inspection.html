@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="seal.svg" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <title>Book an inspection — DYL Real Estate Services</title>
+</head>
+<body>
+  <div id="navbar-root" class="navbar"></div>
+  <main class="container booking-page">
+    <a href="listings.html" class="booking-back">Back to listings</a>
+    <div id="booking-root"><p class="loading-text">Loading property…</p></div>
+  </main>
+  <footer class="footer" id="footer-root"></footer>
+  <script src="js/env.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/connection-check.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    const propertyId = new URLSearchParams(window.location.search).get("id");
+    const root = document.getElementById("booking-root");
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    const minDate = today.toISOString().slice(0, 10);
+
+    function renderBooking(property) {
+      root.innerHTML = `
+        <p class="eyebrow-sm">Private viewing</p>
+        <h1>Book an inspection</h1>
+        <p class="booking-lead">Choose a preferred time to view <strong>${Util.escapeHtml(property.title)}</strong> in ${Util.escapeHtml(property.city)}, ${Util.escapeHtml(property.state)}. We will contact you to confirm the appointment.</p>
+        <div id="booking-message"></div>
+        <form class="booking-form" id="booking-form">
+          <label class="field">Full name<input required id="booking-name" autocomplete="name" /></label>
+          <label class="field">Email address<input required type="email" id="booking-email" autocomplete="email" /></label>
+          <label class="field">Phone number<input required type="tel" id="booking-phone" autocomplete="tel" /></label>
+          <div class="field-row">
+            <label class="field">Preferred date<input required type="date" id="booking-date" min="${minDate}" /></label>
+            <label class="field">Preferred time<select required id="booking-time">
+              <option value="">Choose a time</option>
+              <option value="09:00">9:00 AM</option><option value="10:30">10:30 AM</option>
+              <option value="12:00">12:00 PM</option><option value="14:00">2:00 PM</option>
+              <option value="15:30">3:30 PM</option><option value="17:00">5:00 PM</option>
+            </select></label>
+          </div>
+          <label class="field">Note for the inspection team<textarea id="booking-notes" rows="3" placeholder="Anything we should know?"></textarea></label>
+          <button class="btn btn-primary" type="submit" id="booking-submit">Request inspection</button>
+        </form>`;
+
+      document.getElementById("booking-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const message = document.getElementById("booking-message");
+        const submit = document.getElementById("booking-submit");
+        submit.disabled = true;
+        try {
+          const result = await Api.post(`/properties/${encodeURIComponent(property.id)}/inspections`, {
+            name: document.getElementById("booking-name").value,
+            email: document.getElementById("booking-email").value,
+            phone: document.getElementById("booking-phone").value,
+            inspection_date: document.getElementById("booking-date").value,
+            inspection_time: document.getElementById("booking-time").value,
+            notes: document.getElementById("booking-notes").value,
+          });
+          root.innerHTML = `<div class="booking-success"><p class="eyebrow-sm">Request received</p><h1>Inspection requested</h1><p>${Util.escapeHtml(result.message)} Our team will contact you to confirm the date and time for <strong>${Util.escapeHtml(property.title)}</strong>.</p><a class="btn btn-primary" href="listings.html">Continue browsing</a></div>`;
+        } catch (err) {
+          message.innerHTML = `<p class="alert alert-error">${Util.escapeHtml(err.message)}</p>`;
+          submit.disabled = false;
+        }
+      });
+    }
+
+    if (!propertyId) {
+      root.innerHTML = '<p class="alert alert-error">This booking link is missing a property.</p>';
+    } else {
+      Api.get(`/properties/${encodeURIComponent(propertyId)}`).then((result) => renderBooking(result.data)).catch(() => {
+        root.innerHTML = '<p class="alert alert-error">We could not load this property.</p>';
+      });
+    }
+  </script>
+</body>
+</html>
