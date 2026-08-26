@@ -302,22 +302,28 @@ router.post(
 
 router.post(
   "/forgot-password",
-  [body("email").isEmail().withMessage("A valid email is required.").normalizeEmail()],
+  [
+    body("email").isEmail().withMessage("A valid email is required.").normalizeEmail(),
+    body("client").optional().isIn(["user", "admin"]).withMessage("Invalid reset client."),
+  ],
   async (req, res, next) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
 
-      const users = await db.sql`SELECT id, email FROM users WHERE email = ${req.body.email} LIMIT 1`;
-      if (users.length > 0) {
+      const users = await db.sql`SELECT id, email, role FROM users WHERE email = ${req.body.email} LIMIT 1`;
+      const user = users[0];
+      if (user && (req.body.client !== "admin" || user.role === "admin")) {
         const token = crypto.randomBytes(32).toString("hex");
-        await db.sql`DELETE FROM password_reset_tokens WHERE user_id = ${users[0].id} OR expires_at < NOW()`;
+        await db.sql`DELETE FROM password_reset_tokens WHERE user_id = ${user.id} OR expires_at < NOW()`;
         await db.sql`
           INSERT INTO password_reset_tokens (user_id, token_hash, expires_at)
-          VALUES (${users[0].id}, ${hashResetToken(token)}, NOW() + INTERVAL '1 hour')
+          VALUES (${user.id}, ${hashResetToken(token)}, NOW() + INTERVAL '1 hour')
         `;
-        const resetBase = process.env.CLIENT_ORIGIN || "http://localhost:5500/user-site";
-        await sendResetEmail(users[0].email, `${resetBase.replace(/\/$/, "")}/reset-password.html?token=${token}`);
+        const resetBase = req.body.client === "admin"
+          ? process.env.ADMIN_ORIGIN || "http://localhost:5500/admin-site"
+          : process.env.CLIENT_ORIGIN || "http://localhost:5500/user-site";
+        await sendResetEmail(user.email, `${resetBase.replace(/\/$/, "")}/reset-password.html?token=${token}`);
       }
 
       return res.json({ message: "If an account exists for that email, a reset link has been sent." });
