@@ -17,4 +17,4 @@ window.VERI_ESTATE_API_URL = "https://dly-real-estate-backend.vercel.app/api"; /
 // Optional: only needed if you've set up "Sign in with Google" (see
 // backend/.env.example -> GOOGLE_CLIENT_ID). Leave blank to keep the
 // Google sign-in buttons in their honest "not configured yet" state.
-window.GOOGLE_CLIENT_ID = ""; // e.g. "123-abc.apps.googleusercontent.com"
+window.GOOGLE_CLIENT_ID = "111642357056-rc5r61sb3v4l0i1jbpulh49j8gml05o9.apps.googleusercontent.com";
