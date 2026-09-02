@@ -1,4 +1,4 @@
-# VeriEstate
+# DYL Real Estate Services
 
 A verified real-estate listings platform for Nigeria: buyers browse
 title-checked land, residential, and commercial listings; sellers submit
@@ -6,7 +6,7 @@ listings for review; admins verify (or reject) title documents and run a
 live blog for platform updates.
 
 ```
-veri-estate-site/
+dyl-real-estate-services-site/
 ├── backend/       Express + Postgres API — the only moving part with a server
 ├── user-site/     Public site — plain HTML/CSS/JS, no build step
 └── admin-site/    Admin console — plain HTML/CSS/JS, no build step
@@ -27,7 +27,7 @@ npm run seed      # demo listings, blog posts, and accounts
 npm start
 ```
 
-Leave this running — you should see `VeriEstate API running on
+Leave this running — you should see `DYL Real Estate Services API running on
 http://localhost:4000`. Every page in both sites calls out to this.
 
 **2. Open `user-site/index.html`** with Live Server (or any static server).
@@ -35,7 +35,7 @@ Browse listings, register, save properties, submit a listing, read the blog.
 
 **3. Open `admin-site/login.html`** the same way. Log in with:
 
-- Email: `admin@veriestate.com`
+- Email: `admin@dylrealestateservices.com`
 - Password: `ChangeMe123!`
 
 Verify listings, publish blog posts, manage users — changes show up on the
@@ -146,7 +146,7 @@ itself instead of something you have to go dig for.
 
 - **Red banner: "Can't reach the backend server..."** → the backend isn't
   running, or isn't running on the URL the frontend expects. Check the
-  terminal from step 1 is still alive and shows `VeriEstate API running on
+  terminal from step 1 is still alive and shows `DYL Real Estate Services API running on
   http://localhost:4000`. If you changed the port, update
   `VERI_ESTATE_API_URL` in `js/env.js` in both `user-site` and `admin-site`
   to match.
@@ -155,4 +155,4 @@ itself instead of something you have to go dig for.
 - **Port 4000 in use** → change `PORT=` in `backend/.env`, then update
   `js/env.js` in both sites to match.
 - **Want to reset all data** → stop the server, delete
-  `backend/data/veriestate.db*`, run `npm run seed` again.
+  `backend/data/dylrealestateservices.db*`, run `npm run seed` again.

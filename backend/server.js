@@ -38,7 +38,7 @@ app.use(morgan("dev"));
 app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
-    service: "veri-estate-backend",
+    service: "dyl-real-estate-services-backend",
     time: new Date().toISOString(),
   });
 });
@@ -64,7 +64,7 @@ app.use((err, req, res, next) => {
 // Local development
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`VeriEstate API running on http://localhost:${PORT}`);
+    console.log(`DYL Real Estate Services API running on http://localhost:${PORT}`);
   });
 }
 

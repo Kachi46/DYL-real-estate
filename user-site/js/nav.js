@@ -40,7 +40,7 @@ function renderNavbar() {
       <a href="terms.html">Terms and conditions</a>
       <a href="privacy.html">Privacy policy</a>
       <a href="contact.html">Contact us</a>
-      <a href="mailto:admin@veriestate.com">Contact us by email</a>
+      <a href="mailto:admin@dylrealestateservices.com">Contact us by email</a>
       <a href="tel:+2348000000000">Call customer service</a>
       <a href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
     </div>

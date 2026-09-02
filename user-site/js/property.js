@@ -116,7 +116,7 @@ function render(p) {
 
         ${p.verification_status === "verified" ? `
           <div class="verified-note">
-            This listing's title document has been reviewed by the VeriEstate team and matched against the seller's claim.
+            This listing's title document has been reviewed by the DYL Real Estate Services team and matched against the seller's claim.
             ${p.verification_notes ? `<br /><span style="color:var(--forest-500);">${Util.escapeHtml(p.verification_notes)}</span>` : ""}
           </div>` : ""}
       </div>

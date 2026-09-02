@@ -1,9 +1,9 @@
-# VeriEstate API
+# DYL Real Estate Services API
 
-Express + Postgres backend for VeriEstate — auth, property listings, blog
-posts, and the admin console. This is the same backend used by both the
-React apps and the static HTML/CSS/JS sites; either frontend just needs this
-running and pointed at the right URL.
+Express + Postgres backend for DYL Real Estate Services — auth, property
+listings, blog posts, and the admin console. This is the same backend used
+by both the React apps and the static HTML/CSS/JS sites; either frontend
+just needs this running and pointed at the right URL.
 
 ## Quick start
 
@@ -45,8 +45,8 @@ invokes it directly, no wrapper needed).
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | `admin@veriestate.com` | `ChangeMe123!` (or your `SEED_ADMIN_PASSWORD`) |
-| Demo user | `owner@veriestate.com` | `Password123!` |
+| Admin | `admin@dylrealestateservices.com` | `ChangeMe123!` (or your `SEED_ADMIN_PASSWORD`) |
+| Demo user | `owner@dylrealestateservices.com` | `Password123!` |
 
 **Change these before deploying anywhere real** — they're seeded from
 `.env` (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`), so edit `.env` before
