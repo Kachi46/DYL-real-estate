@@ -199,7 +199,7 @@ function renderAddForm() {
 
     try {
       await Api.post("/properties", payload);
-      successEl.innerHTML = `<p class="alert alert-info">Listing submitted — it will show as "Verification Pending" until the DYL Real Estate Services team reviews the title document.</p>`;
+      successEl.innerHTML = `<p class="alert alert-info">Listing submitted — it will show as "Verification Pending" until the DYL Real-Estate Services team reviews the title document.</p>`;
       document.getElementById("listing-form").reset();
       await refreshData();
       setTimeout(() => showTab("listings"), 900);

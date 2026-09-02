@@ -67,11 +67,25 @@ const Util = {
   },
 
   formatDate(dateStr) {
-    return new Date(dateStr.replace(" ", "T") + "Z").toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    if (!dateStr) return "";
+    const parsed = new Date(dateStr);
+    if (!isNaN(parsed.getTime())) {
+      return parsed.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+    const cleanStr = String(dateStr).replace(" ", "T");
+    const parsedFallback = new Date(cleanStr.endsWith("Z") ? cleanStr : cleanStr + "Z");
+    if (!isNaN(parsedFallback.getTime())) {
+      return parsedFallback.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+    return String(dateStr);
   },
 
   postCardHtml(post) {

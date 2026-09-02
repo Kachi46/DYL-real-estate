@@ -48,6 +48,7 @@ router.get("/", async (req, res, next) => {
         p.cover_image,
         p.published_at,
         p.created_at,
+        p.published,
         u.name AS author_name
       FROM posts p
       JOIN users u

@@ -23,7 +23,7 @@ function notFoundHtml() {
 }
 
 function render(post) {
-  document.title = `${post.title} — DYL Real Estate Services Blog`;
+  document.title = `${post.title} — DYL Real-Estate Services Blog`;
   postRoot.innerHTML = `
     <p class="post-meta">${Util.formatDate(post.published_at)} · By ${Util.escapeHtml(post.author_name)}</p>
     <h1>${Util.escapeHtml(post.title)}</h1>

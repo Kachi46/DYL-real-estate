@@ -14,9 +14,9 @@ function renderSidebar(admin) {
 
   root.innerHTML = `
     <div class="sidebar-brand">
-      <img src="./seal.svg" alt="Logo" height="32" width="32" />
+      <img src="./img/logo.png" alt="DYL Real-Estate Services logo" height="32" width="32" />
       <div>
-        <p class="name">DYL Real Estate Services</p>
+        <p class="name">DYL Real-Estate Services</p>
         <p class="tag">Admin</p>
       </div>
     </div>
@@ -28,7 +28,7 @@ function renderSidebar(admin) {
       <p class="admin-email">${Util.escapeHtml(admin.email)}</p>
       <button id="admin-logout-btn">Log out</button>
     </div>
-    <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Online support</a>
+    <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Online support</a>
   `;
 
   document.getElementById("admin-logout-btn").addEventListener("click", () => {

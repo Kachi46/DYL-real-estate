@@ -1,4 +1,4 @@
-# DYL Real Estate Services
+# DYL Real-Estate Services
 
 A verified real-estate listings platform for Nigeria: buyers browse
 title-checked land, residential, and commercial listings; sellers submit
@@ -27,7 +27,7 @@ npm run seed      # demo listings, blog posts, and accounts
 npm start
 ```
 
-Leave this running — you should see `DYL Real Estate Services API running on
+Leave this running — you should see `DYL Real-Estate Services API running on
 http://localhost:4000`. Every page in both sites calls out to this.
 
 **2. Open `user-site/index.html`** with Live Server (or any static server).
@@ -146,7 +146,7 @@ itself instead of something you have to go dig for.
 
 - **Red banner: "Can't reach the backend server..."** → the backend isn't
   running, or isn't running on the URL the frontend expects. Check the
-  terminal from step 1 is still alive and shows `DYL Real Estate Services API running on
+  terminal from step 1 is still alive and shows `DYL Real-Estate Services API running on
   http://localhost:4000`. If you changed the port, update
   `VERI_ESTATE_API_URL` in `js/env.js` in both `user-site` and `admin-site`
   to match.

@@ -7,8 +7,8 @@ function renderNavbar() {
   root.innerHTML = `
     <div class="navbar-inner">
       <a class="brand" href="index.html">
-        <img src="./seal.svg" alt="Logo" height="28" width="28" />
-        <span>DYL Real Estate Services</span>
+        <img src="./img/logo.png" alt="DYL Real-Estate Services logo" height="28" width="28" />
+        <span>DYL Real-Estate Services</span>
       </a>
 
       <nav class="nav-links">
@@ -42,9 +42,9 @@ function renderNavbar() {
       <a href="contact.html">Contact us</a>
       <a href="mailto:admin@dylrealestateservices.com">Contact us by email</a>
       <a href="tel:+2348000000000">Call customer service</a>
-      <a href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+      <a href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
     </div>
-    <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer"><span class="support-dot"></span> Support</a>
+    <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer"><span class="support-dot"></span> Support</a>
   `;
 
   const menuToggle = document.getElementById("menu-toggle");
@@ -105,9 +105,9 @@ function renderFooter() {
     <div class="container">
       <div class="footer-top">
         <div style="max-width:22rem;">
-          <p class="font-display" style="font-size:1.2rem;font-weight:600;color:#fff;margin:0;">DYL Real Estate Services</p>
+          <p class="font-display" style="font-size:1.2rem;font-weight:600;color:#fff;margin:0;">DYL Real-Estate Services</p>
           <p style="margin-top:0.5rem;font-size:0.875rem;color:var(--forest-300);line-height:1.6;">
-            Every listing on DYL Real Estate Services passes through title document review before it earns
+            Every listing on DYL Real-Estate Services passes through title document review before it earns
             our verification seal. Search land and residential properties across Nigeria with 100% confidence.
           </p>
         </div>
@@ -149,7 +149,7 @@ function renderFooter() {
           </div>
         </div>
       </div>
-      <p class="footer-bottom">© <span id="footer-year"></span> DYL Real Estate Services. Nigeria's title-verified property portal.</p>
+      <p class="footer-bottom">© <span id="footer-year"></span> DYL Real-Estate Services. Nigeria's title-verified property portal.</p>
     </div>
   `;
   document.getElementById("footer-year").textContent = new Date().getFullYear();
