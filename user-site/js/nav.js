@@ -49,12 +49,21 @@ function renderNavbar() {
 
   const menuToggle = document.getElementById("menu-toggle");
   const mobileMenu = document.getElementById("mobile-menu");
-  menuToggle.addEventListener("click", () => {
-    const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
-    menuToggle.setAttribute("aria-expanded", String(!isOpen));
-    menuToggle.setAttribute("aria-label", isOpen ? "Open menu" : "Close menu");
-    mobileMenu.hidden = isOpen;
-  });
+
+  if (menuToggle && mobileMenu) {
+    const setMenuState = (isOpen) => {
+      menuToggle.setAttribute("aria-expanded", String(isOpen));
+      menuToggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
+      mobileMenu.hidden = !isOpen;
+      mobileMenu.classList.toggle("open", isOpen);
+    };
+
+    setMenuState(false);
+    menuToggle.addEventListener("click", () => {
+      const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+      setMenuState(!isOpen);
+    });
+  }
 
   const actions = document.getElementById("nav-actions");
 
