@@ -46,6 +46,18 @@ const NAV_ITEMS = [
   { href: "profile.html", label: "Edit Profile", match: "profile" },
 ];
 
+function getPublicSiteUrl(path) {
+  const configuredUrl = window.VERI_ESTATE_PUBLIC_SITE_URL;
+  if (configuredUrl) return `${configuredUrl.replace(/\/$/, "")}/${path}`;
+
+  const hostname = window.location.hostname;
+  if (hostname.includes("admin-site")) {
+    return `${window.location.protocol}//${hostname.replace("admin-site", "user-site")}/${path}`;
+  }
+
+  return `../user-site/${path}`;
+}
+
 function renderSidebar(admin) {
   const root = document.getElementById("sidebar-root");
   if (!root) return;
@@ -103,7 +115,7 @@ function renderSidebar(admin) {
           </div>
         </div>
 
-        <a href="../user-site/index.html" class="profile-menu-item" target="_blank">
+        <a href="${getPublicSiteUrl("index.html")}" class="profile-menu-item" target="_blank">
           <span>Home Page</span>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
         </a>
@@ -118,7 +130,7 @@ function renderSidebar(admin) {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line></svg>
         </a>
 
-        <a href="../user-site/trust.html" class="profile-menu-item" target="_blank">
+        <a href="${getPublicSiteUrl("trust.html")}" class="profile-menu-item" target="_blank">
           <span>Docs</span>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
         </a>
@@ -129,7 +141,7 @@ function renderSidebar(admin) {
         </button>
       </div>
 
-      <a class="profile-card-action-btn" href="../user-site/index.html" target="_blank">View Public Site</a>
+      <a class="profile-card-action-btn" href="${getPublicSiteUrl("index.html")}" target="_blank">View Public Site</a>
     </div>
   `;
 

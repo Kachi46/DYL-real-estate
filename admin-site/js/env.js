@@ -13,3 +13,8 @@
 // http://localhost:4000/api from every visitor's browser, which does
 // not exist for them - that's why nothing loads.
 window.VERI_ESTATE_API_URL = "https://dly-real-estate-backend.vercel.app/api"; // e.g. "https://your-backend.vercel.app/api"
+
+// Set this to the deployed public-site URL when the admin and public sites
+// are hosted as separate projects. The hostname fallback handles the
+// default admin-site.vercel.app / user-site.vercel.app setup automatically.
+window.VERI_ESTATE_PUBLIC_SITE_URL = "";
