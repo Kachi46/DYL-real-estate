@@ -17,9 +17,24 @@ function renderNavbar() {
         <a href="listings.html?property_type=residential">New Project</a>
         <span class="nav-divider">|</span>
         <a href="listings.html?listing_type=rent&property_type=residential">Shortlet</a>
-        <a href="listings.html">Agents</a>
+        <a href="agents.html">Agents</a>
         <a href="index.html#locations">Area Guide</a>
         <a href="blog.html">Blogs</a>
+        <div class="nav-dropdown" id="nav-dropdown">
+          <button type="button" class="nav-dropdown-btn" id="nav-dropdown-btn" aria-haspopup="true" aria-expanded="false">
+            More <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:2px;display:inline-block;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="nav-dropdown-menu" id="nav-dropdown-menu">
+            <a href="testimonials.html">Testimonials</a>
+            <a href="services.html">Services</a>
+            <a href="trust.html">Trust and legal</a>
+            <a href="about.html">About us</a>
+            <a href="book-inspection.html">Book an inspection</a>
+            <a href="mortgage.html">Mortgage calculator</a>
+            <a href="faq.html">FAQ</a>
+            <a href="contact.html">Contact us</a>
+          </div>
+        </div>
         <a href="dashboard.html" id="nav-dashboard-link" style="display:none;">My Dashboard</a>
       </nav>
 
@@ -28,7 +43,7 @@ function renderNavbar() {
     </div>
     <div class="mobile-menu" id="mobile-menu" hidden>
       <a href="trust.html">Trust and legal</a>
-      <a href="index.html#about">About us</a>
+      <a href="about.html">About us</a>
       <a href="services.html">Services</a>
       <a href="listings.html">Properties / listings</a>
       <a href="agents.html">Agent profile</a>
@@ -62,6 +77,23 @@ function renderNavbar() {
     menuToggle.addEventListener("click", () => {
       const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
       setMenuState(!isOpen);
+    });
+  }
+
+  const navDropdown = document.getElementById("nav-dropdown");
+  const navDropdownBtn = document.getElementById("nav-dropdown-btn");
+  if (navDropdown && navDropdownBtn) {
+    navDropdownBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = navDropdown.classList.toggle("open");
+      navDropdownBtn.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!navDropdown.contains(e.target)) {
+        navDropdown.classList.remove("open");
+        navDropdownBtn.setAttribute("aria-expanded", "false");
+      }
     });
   }
 
@@ -139,6 +171,8 @@ function renderFooter() {
               <li><a href="trust.html">Trust and legal</a></li>
               <li><a href="about.html">About us</a></li>
               <li><a href="services.html">Services</a></li>
+              <li><a href="testimonials.html">Testimonials</a></li>
+              <li><a href="book-inspection.html">Book an inspection</a></li>
               <li><a href="contact.html">Contact us</a></li>
               <li><a href="faq.html">FAQ</a></li>
               <li><a href="mortgage.html">Mortgage calculator</a></li>
