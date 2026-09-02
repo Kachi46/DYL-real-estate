@@ -24,7 +24,7 @@
   --gold-600: #7a5e26;
   --gold-700: #5c481d;
 
-  --sand: #f8f6f1;
+  --sand: #ffffff;
   --ink: #1a1a17;
   --line: rgba(12, 33, 27, 0.1);
 
@@ -67,7 +67,7 @@ button { font-family: inherit; cursor: pointer; }
 /* Navbar */
 .navbar {
   position: sticky; top: 0; z-index: 40;
-  background: rgba(248, 246, 241, 0.92);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }

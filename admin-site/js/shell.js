@@ -1,6 +1,6 @@
 const ThemeManager = {
   getThemeSetting() {
-    return localStorage.getItem("theme-setting") || "system";
+    return localStorage.getItem("theme-setting") || "light";
   },
   getEffectiveTheme(setting) {
     if (setting === "system") {
@@ -14,7 +14,7 @@ const ThemeManager = {
     document.documentElement.setAttribute("data-theme", effective);
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute("content", effective === "dark" ? "#071510" : "#f8f6f1");
+      metaTheme.setAttribute("content", effective === "dark" ? "#071510" : "#ffffff");
     }
     this.updateButtons(setting);
   },

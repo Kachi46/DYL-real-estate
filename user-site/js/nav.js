@@ -1,13 +1,13 @@
 const ThemeManager = {
   getTheme() {
-    return localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    return localStorage.getItem("theme") || "light";
   },
   apply(theme) {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute("content", theme === "dark" ? "#071510" : "#f8f6f1");
+      metaTheme.setAttribute("content", theme === "dark" ? "#071510" : "#ffffff");
     }
     this.updateButton(theme);
   },
