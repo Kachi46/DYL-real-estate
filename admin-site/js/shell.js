@@ -51,6 +51,12 @@ function renderSidebar(admin) {
   if (!root) return;
   const current = document.body.dataset.page;
 
+  root.insertAdjacentHTML("beforebegin", `
+    <button type="button" class="admin-menu-toggle" id="admin-menu-toggle" aria-controls="sidebar-root" aria-expanded="false" aria-label="Open admin menu">
+      <span></span><span></span><span></span>
+    </button>
+  `);
+
   root.innerHTML = `
     <div class="sidebar-brand">
       <img src="./img/logo.png" alt="DYL Real-Estate Services logo" height="32" width="32" />
@@ -139,6 +145,21 @@ function renderSidebar(admin) {
   document.getElementById("admin-logout-btn").addEventListener("click", () => {
     Api.clearToken();
     window.location.href = "login.html";
+  });
+
+  const menuToggle = document.getElementById("admin-menu-toggle");
+  menuToggle.addEventListener("click", () => {
+    const isOpen = root.classList.toggle("is-open");
+    menuToggle.setAttribute("aria-expanded", String(isOpen));
+    menuToggle.setAttribute("aria-label", isOpen ? "Close admin menu" : "Open admin menu");
+  });
+
+  root.querySelectorAll(".sidebar-nav a").forEach((link) => {
+    link.addEventListener("click", () => {
+      root.classList.remove("is-open");
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.setAttribute("aria-label", "Open admin menu");
+    });
   });
 }
 
