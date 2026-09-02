@@ -1,3 +1,38 @@
+const ThemeManager = {
+  getTheme() {
+    return localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  },
+  apply(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute("content", theme === "dark" ? "#071510" : "#f8f6f1");
+    }
+    this.updateButton(theme);
+  },
+  toggle() {
+    const next = this.getTheme() === "dark" ? "light" : "dark";
+    this.apply(next);
+  },
+  updateButton(theme) {
+    const btn = document.getElementById("theme-toggle-btn");
+    if (!btn) return;
+    const isDark = theme === "dark";
+    btn.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+    btn.setAttribute("title", isDark ? "Switch to light mode" : "Switch to dark mode");
+    btn.innerHTML = isDark
+      ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`
+      : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+  },
+  init() {
+    this.apply(this.getTheme());
+  }
+};
+
+// Immediately apply theme to avoid flash
+ThemeManager.init();
+
 function renderNavbar() {
   const root = document.getElementById("navbar-root");
   if (!root) return;
@@ -20,25 +55,11 @@ function renderNavbar() {
         <a href="agents.html">Agents</a>
         <a href="index.html#locations">Area Guide</a>
         <a href="blog.html">Blogs</a>
-        <div class="nav-dropdown" id="nav-dropdown">
-          <button type="button" class="nav-dropdown-btn" id="nav-dropdown-btn" aria-haspopup="true" aria-expanded="false">
-            More <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:2px;display:inline-block;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-          </button>
-          <div class="nav-dropdown-menu" id="nav-dropdown-menu">
-            <a href="testimonials.html">Testimonials</a>
-            <a href="services.html">Services</a>
-            <a href="trust.html">Trust and legal</a>
-            <a href="about.html">About us</a>
-            <a href="book-inspection.html">Book an inspection</a>
-            <a href="mortgage.html">Mortgage calculator</a>
-            <a href="faq.html">FAQ</a>
-            <a href="contact.html">Contact us</a>
-          </div>
-        </div>
         <a href="dashboard.html" id="nav-dashboard-link" style="display:none;">My Dashboard</a>
       </nav>
 
       <div class="nav-actions" id="nav-actions"></div>
+      <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle theme"></button>
       <button type="button" class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu"><span></span><span></span><span></span></button>
     </div>
     <div class="mobile-menu" id="mobile-menu" hidden>
@@ -62,6 +83,12 @@ function renderNavbar() {
     <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer"><span class="support-dot"></span> Support</a>
   `;
 
+  ThemeManager.updateButton(ThemeManager.getTheme());
+  const themeBtn = document.getElementById("theme-toggle-btn");
+  if (themeBtn) {
+    themeBtn.addEventListener("click", () => ThemeManager.toggle());
+  }
+
   const menuToggle = document.getElementById("menu-toggle");
   const mobileMenu = document.getElementById("mobile-menu");
 
@@ -77,23 +104,6 @@ function renderNavbar() {
     menuToggle.addEventListener("click", () => {
       const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
       setMenuState(!isOpen);
-    });
-  }
-
-  const navDropdown = document.getElementById("nav-dropdown");
-  const navDropdownBtn = document.getElementById("nav-dropdown-btn");
-  if (navDropdown && navDropdownBtn) {
-    navDropdownBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const isOpen = navDropdown.classList.toggle("open");
-      navDropdownBtn.setAttribute("aria-expanded", String(isOpen));
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!navDropdown.contains(e.target)) {
-        navDropdown.classList.remove("open");
-        navDropdownBtn.setAttribute("aria-expanded", "false");
-      }
     });
   }
 
