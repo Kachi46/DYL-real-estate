@@ -15,8 +15,29 @@
     <aside class="sidebar" id="sidebar-root"></aside>
     <main class="admin-main">
       <h1>Edit Profile</h1>
-      <p class="admin-sub">Update the password for your administrator account.</p>
+      <p class="admin-sub">Update your administrator settings and appearance preferences.</p>
+
       <section class="sidebar-card" style="max-width:520px; margin-top:1.5rem;">
+        <h2 style="font-size:1.1rem; margin:0 0 0.35rem; color:var(--forest-900);">Appearance &amp; Theme</h2>
+        <p style="font-size:0.85rem; color:var(--forest-500); margin:0 0 1.25rem;">Select your preferred interface appearance for the dashboard.</p>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; background:var(--forest-50); border:1px solid var(--line); border-radius:var(--radius-md);">
+          <span style="font-size:0.9rem; font-weight:500; color:var(--forest-800);">Theme Mode</span>
+          <div class="theme-segment-control" style="background:rgba(0,0,0,0.15); border:1px solid var(--line); padding:3px;">
+            <button type="button" class="theme-segment-btn" data-theme-val="system" title="System" style="color:var(--forest-700); padding:4px 10px; font-size:0.8rem; font-weight:500;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg> System
+            </button>
+            <button type="button" class="theme-segment-btn" data-theme-val="light" title="Light" style="color:var(--forest-700); padding:4px 10px; font-size:0.8rem; font-weight:500;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg> Light
+            </button>
+            <button type="button" class="theme-segment-btn" data-theme-val="dark" title="Dark" style="color:var(--forest-700); padding:4px 10px; font-size:0.8rem; font-weight:500;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="sidebar-card" style="max-width:520px; margin-top:1.5rem;">
+        <h2 style="font-size:1.1rem; margin:0 0 0.35rem; color:var(--forest-900);">Change Password</h2>
         <div id="profile-message"></div>
         <form id="password-form">
           <label class="field">Current password<input required type="password" id="current-password" autocomplete="current-password" /></label>

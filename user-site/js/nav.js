@@ -59,7 +59,6 @@ function renderNavbar() {
       </nav>
 
       <div class="nav-actions" id="nav-actions"></div>
-      <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle theme"></button>
       <button type="button" class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu"><span></span><span></span><span></span></button>
     </div>
     <div class="mobile-menu" id="mobile-menu" hidden>
@@ -82,12 +81,6 @@ function renderNavbar() {
     </div>
     <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer"><span class="support-dot"></span> Support</a>
   `;
-
-  ThemeManager.updateButton(ThemeManager.getTheme());
-  const themeBtn = document.getElementById("theme-toggle-btn");
-  if (themeBtn) {
-    themeBtn.addEventListener("click", () => ThemeManager.toggle());
-  }
 
   const menuToggle = document.getElementById("menu-toggle");
   const mobileMenu = document.getElementById("mobile-menu");
