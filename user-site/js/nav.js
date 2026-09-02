@@ -115,8 +115,7 @@ function renderNavbar() {
     .then((res) => {
       document.getElementById("nav-dashboard-link").style.display = "";
       actions.innerHTML = `
-        <span style="font-size:0.85rem;color:var(--forest-700);" class="hide-mobile">Hi, ${Util.escapeHtml(res.user.name.split(" ")[0])}</span>
-        <a href="dashboard.html" class="btn btn-gold">Post Property</a>
+        <span class="user-greeting">Hi, ${Util.escapeHtml(res.user.name.split(" ")[0])}</span>
         <button class="btn btn-outline" id="logout-btn" style="padding:0.45rem 0.85rem;">Log out</button>
       `;
       document.getElementById("logout-btn").addEventListener("click", () => {
