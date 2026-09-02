@@ -17,4 +17,4 @@ window.VERI_ESTATE_API_URL = "https://dly-real-estate-backend.vercel.app/api"; /
 // Set this to the deployed public-site URL when the admin and public sites
 // are hosted as separate projects. The hostname fallback handles the
 // default admin-site.vercel.app / user-site.vercel.app setup automatically.
-window.VERI_ESTATE_PUBLIC_SITE_URL = "";
+window.VERI_ESTATE_PUBLIC_SITE_URL = "https://veri-estate-user-site.vercel.app";
