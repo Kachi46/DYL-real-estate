@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const db = require("./db");
 
 async function seed() {
-  console.log("Starting DYL Real Estate Services PostgreSQL seed...");
+  console.log("Starting DYL Real-Estate Services PostgreSQL seed...");
 
   // --------------------------------------------------
   // Demo owner
@@ -230,7 +230,7 @@ async function seed() {
         role
       )
       VALUES (
-        ${"DYL Real Estate Services Admin"},
+        ${"DYL Real-Estate Services Admin"},
         ${adminEmail},
         ${hash},
         ${"admin"}
@@ -264,16 +264,16 @@ async function seed() {
   const samplePosts = [
     {
       title:
-        "How DYL Real Estate Services checks a land title before it goes live",
+        "How DYL Real-Estate Services checks a land title before it goes live",
 
       excerpt:
         "A walkthrough of the three-step review every listing passes before it earns the seal.",
 
       content:
-        "Every listing submitted to DYL Real Estate Services goes through a document review before it's visible to buyers.\n\n" +
+        "Every listing submitted to DYL Real-Estate Services goes through a document review before it's visible to buyers.\n\n" +
         "First, the seller uploads the title document — a Certificate of Occupancy, Governor's Consent, or Deed of Assignment. " +
         "Second, our team cross-checks the document details against public land registry records where available, looking for " +
-        "mismatched names, altered dates, or duplicate plot numbers. Third, listings that pass receive the DYL Real Estate Services seal; " +
+        "mismatched names, altered dates, or duplicate plot numbers. Third, listings that pass receive the DYL Real-Estate Services seal; " +
         "anything still under review is clearly marked pending so buyers always know where a listing stands.\n\n" +
         "We publish outcomes transparently: rejected listings stay marked as rejected rather than being quietly removed, so " +
         "the review process stays visible end to end.",
@@ -363,7 +363,7 @@ async function seed() {
     );
   }
 
-  console.log("DYL Real Estate Services seed completed successfully.");
+  console.log("DYL Real-Estate Services seed completed successfully.");
 }
 
 seed().catch((err) => {

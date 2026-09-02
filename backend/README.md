@@ -1,6 +1,6 @@
-# DYL Real Estate Services API
+# DYL Real-Estate Services API
 
-Express + Postgres backend for DYL Real Estate Services — auth, property
+Express + Postgres backend for DYL Real-Estate Services — auth, property
 listings, blog posts, and the admin console. This is the same backend used
 by both the React apps and the static HTML/CSS/JS sites; either frontend
 just needs this running and pointed at the right URL.

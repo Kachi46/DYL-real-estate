@@ -64,7 +64,7 @@ app.use((err, req, res, next) => {
 // Local development
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`DYL Real Estate Services API running on http://localhost:${PORT}`);
+    console.log(`DYL Real-Estate Services API running on http://localhost:${PORT}`);
   });
 }
 

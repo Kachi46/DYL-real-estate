@@ -1,7 +1,7 @@
 {
   "name": "dyl-real-estate-services-backend",
   "version": "1.0.0",
-  "description": "DYL Real Estate Services API - verified real estate listings backend",
+  "description": "DYL Real-Estate Services API - verified real estate listings backend",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {

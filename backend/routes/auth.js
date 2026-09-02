@@ -33,7 +33,7 @@ async function sendResetEmail(email, resetUrl) {
   await mailer.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to: email,
-    subject: "Reset your DYL Real Estate Services password",
+    subject: "Reset your DYL Real-Estate Services password",
     text: `Reset your password using this link. It expires in one hour:\n\n${resetUrl}`,
     html: `<p>Reset your password using the link below. It expires in one hour.</p><p><a href="${resetUrl}">Reset password</a></p>`,
   });
