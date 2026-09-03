@@ -171,7 +171,7 @@ button { font-family: inherit; cursor: pointer; }
 
 @media (max-width: 767px) {
   body { padding-bottom: 4.25rem; }
-  .navbar-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.45rem; padding-left: 1rem; padding-right: 1rem; }
+  .navbar-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 0.45rem; padding-left: 1rem; padding-right: 1rem; }
   .brand { min-width: 0; }
   .brand span { font-size: 1rem; line-height: 1.05; }
   .nav-actions { gap: 0.4rem; }

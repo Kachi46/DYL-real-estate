@@ -59,6 +59,7 @@ function renderNavbar() {
       </nav>
 
       <div class="nav-actions" id="nav-actions"></div>
+      <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Switch to dark mode" title="Switch to dark mode"></button>
     </div>
     <nav class="mobile-bottom-nav" aria-label="More pages">
       <a href="trust.html">Trust and legal</a>
@@ -80,6 +81,9 @@ function renderNavbar() {
     </nav>
     <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer"><span class="support-dot"></span> Support</a>
   `;
+
+  ThemeManager.updateButton(ThemeManager.getTheme());
+  document.getElementById("theme-toggle-btn").addEventListener("click", () => ThemeManager.toggle());
 
   const actions = document.getElementById("nav-actions");
 
