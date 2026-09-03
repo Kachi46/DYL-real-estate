@@ -59,9 +59,8 @@ function renderNavbar() {
       </nav>
 
       <div class="nav-actions" id="nav-actions"></div>
-      <button type="button" class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu"><span></span><span></span><span></span></button>
     </div>
-    <div class="mobile-menu" id="mobile-menu" hidden>
+    <nav class="mobile-bottom-nav" aria-label="More pages">
       <a href="trust.html">Trust and legal</a>
       <a href="about.html">About us</a>
       <a href="services.html">Services</a>
@@ -78,27 +77,9 @@ function renderNavbar() {
       <a href="mailto:admin@dylrealestateservices.com">Contact us by email</a>
       <a href="tel:+2348000000000">Call customer service</a>
       <a href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
-    </div>
+    </nav>
     <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer"><span class="support-dot"></span> Support</a>
   `;
-
-  const menuToggle = document.getElementById("menu-toggle");
-  const mobileMenu = document.getElementById("mobile-menu");
-
-  if (menuToggle && mobileMenu) {
-    const setMenuState = (isOpen) => {
-      menuToggle.setAttribute("aria-expanded", String(isOpen));
-      menuToggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
-      mobileMenu.hidden = !isOpen;
-      mobileMenu.classList.toggle("open", isOpen);
-    };
-
-    setMenuState(false);
-    menuToggle.addEventListener("click", () => {
-      const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
-      setMenuState(!isOpen);
-    });
-  }
 
   const actions = document.getElementById("nav-actions");
 
