@@ -66,6 +66,23 @@ const Util = {
     `;
   },
 
+  // Blog post `content` is authored as Markdown in the admin console.
+  // `marked` turns it into HTML; `DOMPurify` strips anything dangerous
+  // (script tags, inline event handlers, etc) out of that HTML before
+  // it's ever put in the DOM - post content ultimately comes from an
+  // admin account, but sanitizing it anyway costs nothing and means a
+  // compromised/careless admin session can't inject a working script tag
+  // into a page every visitor loads.
+  renderMarkdown(markdown) {
+    if (!markdown) return "";
+    if (typeof marked === "undefined" || typeof DOMPurify === "undefined") {
+      // CDN scripts failed to load (offline, ad-blocker, etc) - fall back
+      // to escaped plain text rather than showing nothing.
+      return `<p>${Util.escapeHtml(markdown)}</p>`;
+    }
+    return DOMPurify.sanitize(marked.parse(markdown));
+  },
+
   formatDate(dateStr) {
     if (!dateStr) return "";
     const parsed = new Date(dateStr);
@@ -103,5 +120,26 @@ const Util = {
         </div>
       </a>
     `;
+  },
+
+  // Renders a Prev/Next bar from the `{ page, limit, total, totalPages }`
+  // shape paginated endpoints return. Returns "" when there's only one
+  // page, so callers can always append this without an extra check.
+  paginationBar(pagination) {
+    if (!pagination || pagination.totalPages <= 1) return "";
+    const { page, totalPages, total } = pagination;
+    return `
+      <div class="pagination-bar">
+        <button class="btn btn-outline" data-page="${page - 1}" ${page <= 1 ? "disabled" : ""}>← Prev</button>
+        <span class="pagination-info">Page ${page} of ${totalPages} · ${total} total</span>
+        <button class="btn btn-outline" data-page="${page + 1}" ${page >= totalPages ? "disabled" : ""}>Next →</button>
+      </div>
+    `;
+  },
+  wirePagination(container, onPageChange) {
+    container.querySelectorAll("[data-page]").forEach((btn) => {
+      if (btn.disabled) return;
+      btn.addEventListener("click", () => onPageChange(Number(btn.dataset.page)));
+    });
   },
 };

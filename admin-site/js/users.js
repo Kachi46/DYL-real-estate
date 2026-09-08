@@ -1,14 +1,20 @@
+let currentUsersPage = 1;
+
 async function loadUsers() {
   const table = document.getElementById("users-table");
   try {
-    const res = await Api.get("/admin/users");
-    renderUsers(res.data);
+    const res = await Api.get("/admin/users", { page: currentUsersPage });
+    if (res.data.length === 0 && currentUsersPage > 1 && res.pagination?.total > 0) {
+      currentUsersPage -= 1;
+      return loadUsers();
+    }
+    renderUsers(res.data, res.pagination);
   } catch (err) {
     table.innerHTML = `<p class="loading-text" style="padding:1.5rem;">Couldn't load users.</p>`;
   }
 }
 
-function renderUsers(users) {
+function renderUsers(users, pagination) {
   const table = document.getElementById("users-table");
   const rows = users.map((u) => `
     <tr>
@@ -32,7 +38,13 @@ function renderUsers(users) {
       <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Account type</th><th>Role</th><th>Joined</th><th></th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
+    ${Util.paginationBar(pagination)}
   `;
+
+  Util.wirePagination(table, (page) => {
+    currentUsersPage = page;
+    loadUsers();
+  });
 
   table.querySelectorAll("button[data-action]").forEach((btn) => {
     btn.addEventListener("click", () => handleAction(btn));

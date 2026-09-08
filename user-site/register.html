@@ -88,12 +88,12 @@
       <label class="field">
         Create password
         <div class="password-field-wrap">
-          <input required type="password" minlength="6" id="reg-password" placeholder="Password" />
+          <input required type="password" minlength="8" id="reg-password" placeholder="Password" />
           <button type="button" class="password-toggle" id="password-toggle-btn">Show</button>
         </div>
       </label>
       <div class="password-requirement" id="password-req">
-        <span class="req-check">✓</span> 6 characters minimum
+        <span class="req-check">✓</span> 8 characters minimum
       </div>
 
       <div class="pref-block">
@@ -150,10 +150,10 @@
       passwordToggleBtn.textContent = showing ? "Show" : "Hide";
     });
 
-    // Live "6 characters minimum" check
+    // Live "8 characters minimum" check
     const passwordReq = document.getElementById("password-req");
     passwordInput.addEventListener("input", () => {
-      passwordReq.classList.toggle("met", passwordInput.value.length >= 6);
+      passwordReq.classList.toggle("met", passwordInput.value.length >= 8);
     });
 
     // Email preferences toggle

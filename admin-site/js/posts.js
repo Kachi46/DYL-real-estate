@@ -1,11 +1,18 @@
 const view = document.getElementById("posts-view");
 let posts = [];
+let postsPagination = null;
+let currentPostsPage = 1;
 
 async function loadPosts() {
   view.innerHTML = `<p class="loading-text">Loading…</p>`;
   try {
-    const res = await Api.get("/admin/posts");
+    const res = await Api.get("/admin/posts", { page: currentPostsPage });
+    if (res.data.length === 0 && currentPostsPage > 1 && res.pagination?.total > 0) {
+      currentPostsPage -= 1;
+      return loadPosts();
+    }
     posts = res.data;
+    postsPagination = res.pagination;
     renderListView();
   } catch (err) {
     view.innerHTML = `<p class="loading-text">Couldn't load posts.</p>`;
@@ -43,7 +50,13 @@ function renderListView() {
             <tbody>${rows}</tbody>
           </table>`}
     </div>
+    ${Util.paginationBar(postsPagination)}
   `;
+
+  Util.wirePagination(view, (page) => {
+    currentPostsPage = page;
+    loadPosts();
+  });
 
   document.getElementById("new-post-btn").addEventListener("click", () => renderEditorView(null));
   view.querySelectorAll("button[data-action]").forEach((btn) => {
@@ -92,9 +105,13 @@ function renderEditorView(post) {
         <input id="pf-cover" placeholder="https://…" value="${isNew ? "" : Util.escapeHtml(post.cover_image || "")}" />
       </label>
       <label class="field">
-        Content
-        <textarea required id="pf-content">${isNew ? "" : Util.escapeHtml(post.content)}</textarea>
+        Content (Markdown supported — **bold**, _italic_, [links](url), lists, headings)
+        <textarea required id="pf-content" rows="12">${isNew ? "" : Util.escapeHtml(post.content)}</textarea>
       </label>
+      <div class="field">
+        Live preview
+        <div id="pf-preview" class="post-editor-preview"></div>
+      </div>
       <label class="checkbox-field">
         <input type="checkbox" id="pf-published" ${!isNew && post.published ? "checked" : ""} />
         Published (visible on the public blog)
@@ -108,6 +125,12 @@ function renderEditorView(post) {
 
   document.getElementById("back-btn").addEventListener("click", renderListView);
   document.getElementById("pf-cancel").addEventListener("click", renderListView);
+
+  const contentField = document.getElementById("pf-content");
+  const previewEl = document.getElementById("pf-preview");
+  const updatePreview = () => { previewEl.innerHTML = Util.renderMarkdown(contentField.value); };
+  contentField.addEventListener("input", updatePreview);
+  updatePreview();
 
   document.getElementById("post-form").addEventListener("submit", async (e) => {
     e.preventDefault();

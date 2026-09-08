@@ -31,7 +31,7 @@ function render(post) {
       <div class="post-cover">
         <img src="${Util.escapeHtml(post.cover_image)}" alt="${Util.escapeHtml(post.title)}" />
       </div>` : ""}
-    <div class="post-body">${Util.escapeHtml(post.content)}</div>
+    <div class="post-body">${Util.renderMarkdown(post.content)}</div>
   `;
 }
 

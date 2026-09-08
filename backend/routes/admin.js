@@ -2,6 +2,9 @@ const express = require("express");
 const { body, validationResult } = require("express-validator");
 const db = require("../db");
 const { authenticate, requireAdmin } = require("../middleware/auth");
+const { notifyListingStatusChange } = require("../lib/notifications");
+const { parsePagination, paginationMeta } = require("../lib/pagination");
+const { logAdminAction } = require("../lib/auditLog");
 
 const router = express.Router();
 
@@ -92,26 +95,30 @@ router.get("/stats", async (req, res, next) => {
 router.get("/properties", async (req, res, next) => {
   try {
     const { verification_status } = req.query;
+    const { page, limit, offset } = parsePagination(req.query, { defaultLimit: 100, maxLimit: 100 });
 
-    let rows;
+    const whereClause = verification_status
+      ? db.sql`WHERE verification_status = ${verification_status}`
+      : db.sql``;
 
-    if (verification_status) {
-      rows = await db.sql`
-        SELECT *
-        FROM properties
-        WHERE verification_status = ${verification_status}
-        ORDER BY created_at DESC
-      `;
-    } else {
-      rows = await db.sql`
-        SELECT *
-        FROM properties
-        ORDER BY created_at DESC
-      `;
-    }
+    const countRows = await db.sql`
+      SELECT COUNT(*)::int AS count
+      FROM properties
+      ${whereClause}
+    `;
+
+    const rows = await db.sql`
+      SELECT *
+      FROM properties
+      ${whereClause}
+      ORDER BY created_at DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
+    `;
 
     return res.json({
       data: rows.map(parseProperty),
+      pagination: paginationMeta(page, limit, countRows[0]?.count || 0),
     });
   } catch (err) {
     next(err);
@@ -174,14 +181,43 @@ router.patch(
       `;
 
       const rows = await db.sql`
-        SELECT *
-        FROM properties
-        WHERE id = ${req.params.id}
+        SELECT p.*, u.email AS owner_email, u.name AS owner_name
+        FROM properties p
+        JOIN users u ON u.id = p.owner_id
+        WHERE p.id = ${req.params.id}
         LIMIT 1
       `;
+      const { owner_email, owner_name, ...propertyRow } = rows[0] || {};
+
+      // Best-effort: the verification decision itself already succeeded
+      // and is what the admin actually asked for - an SMTP hiccup telling
+      // the owner about it shouldn't turn this into a failed request.
+      try {
+        await notifyListingStatusChange({
+          ownerEmail: owner_email,
+          ownerName: owner_name,
+          listingTitle: propertyRow.title,
+          status: verification_status,
+          notes: verification_notes,
+        });
+      } catch (emailErr) {
+        console.error("Failed to send listing status notification:", emailErr);
+      }
+
+      try {
+        await logAdminAction({
+          adminId: req.user.id,
+          action: "property.verification_status_changed",
+          targetType: "property",
+          targetId: req.params.id,
+          details: { verification_status, verification_notes: verification_notes || null },
+        });
+      } catch (logErr) {
+        console.error("Failed to write audit log entry:", logErr);
+      }
 
       return res.json({
-        data: parseProperty(rows[0]),
+        data: parseProperty(propertyRow),
       });
     } catch (err) {
       next(err);
@@ -193,6 +229,10 @@ router.patch(
 // List all users
 router.get("/users", async (req, res, next) => {
   try {
+    const { page, limit, offset } = parsePagination(req.query, { defaultLimit: 100, maxLimit: 100 });
+
+    const countRows = await db.sql`SELECT COUNT(*)::int AS count FROM users`;
+
     const rows = await db.sql`
       SELECT
         id,
@@ -208,10 +248,13 @@ router.get("/users", async (req, res, next) => {
         created_at
       FROM users
       ORDER BY created_at DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
     `;
 
     return res.json({
       data: rows,
+      pagination: paginationMeta(page, limit, countRows[0]?.count || 0),
     });
   } catch (err) {
     next(err);
@@ -267,6 +310,18 @@ router.patch(
         WHERE id = ${req.params.id}
       `;
 
+      try {
+        await logAdminAction({
+          adminId: req.user.id,
+          action: "user.role_changed",
+          targetType: "user",
+          targetId: req.params.id,
+          details: { new_role: req.body.role },
+        });
+      } catch (logErr) {
+        console.error("Failed to write audit log entry:", logErr);
+      }
+
       return res.json({
         message: "User role updated.",
       });
@@ -292,7 +347,7 @@ router.delete("/users/:id", async (req, res, next) => {
     }
 
     const existingRows = await db.sql`
-      SELECT id
+      SELECT id, email
       FROM users
       WHERE id = ${req.params.id}
       LIMIT 1
@@ -350,6 +405,18 @@ router.delete("/users/:id", async (req, res, next) => {
       WHERE id = ${req.params.id}
     `;
 
+    try {
+      await logAdminAction({
+        adminId: req.user.id,
+        action: "user.deleted",
+        targetType: "user",
+        targetId: req.params.id,
+        details: { email: existingRows[0].email },
+      });
+    } catch (logErr) {
+      console.error("Failed to write audit log entry:", logErr);
+    }
+
     return res.status(204).send();
   } catch (err) {
     next(err);
@@ -366,25 +433,29 @@ router.get("/inquiries", async (req, res, next) => {
       return res.status(400).json({ error: "Invalid property ID." });
     }
 
-    let rows;
+    const { page, limit, offset } = parsePagination(req.query, { defaultLimit: 100, maxLimit: 100 });
+    const whereClause = property_id
+      ? db.sql`WHERE property_id = ${property_id}`
+      : db.sql``;
 
-    if (property_id) {
-      rows = await db.sql`
-        SELECT *
-        FROM inquiries
-        WHERE property_id = ${property_id}
-        ORDER BY created_at DESC
-      `;
-    } else {
-      rows = await db.sql`
-        SELECT *
-        FROM inquiries
-        ORDER BY created_at DESC
-      `;
-    }
+    const countRows = await db.sql`
+      SELECT COUNT(*)::int AS count
+      FROM inquiries
+      ${whereClause}
+    `;
+
+    const rows = await db.sql`
+      SELECT *
+      FROM inquiries
+      ${whereClause}
+      ORDER BY created_at DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
+    `;
 
     return res.json({
       data: rows,
+      pagination: paginationMeta(page, limit, countRows[0]?.count || 0),
     });
   } catch (err) {
     next(err);
@@ -394,13 +465,22 @@ router.get("/inquiries", async (req, res, next) => {
 // GET /api/admin/inspections
 router.get("/inspections", async (req, res, next) => {
   try {
+    const { page, limit, offset } = parsePagination(req.query, { defaultLimit: 100, maxLimit: 100 });
+
+    const countRows = await db.sql`SELECT COUNT(*)::int AS count FROM inspection_bookings`;
+
     const rows = await db.sql`
       SELECT b.*, p.title AS property_title, p.city, p.state
       FROM inspection_bookings b
       JOIN properties p ON p.id = b.property_id
       ORDER BY b.inspection_date ASC, b.inspection_time ASC, b.created_at DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
     `;
-    return res.json({ data: rows });
+    return res.json({
+      data: rows,
+      pagination: paginationMeta(page, limit, countRows[0]?.count || 0),
+    });
   } catch (err) {
     next(err);
   }
@@ -422,6 +502,19 @@ router.patch(
         RETURNING *
       `;
       if (rows.length === 0) return res.status(404).json({ error: "Inspection request not found." });
+
+      try {
+        await logAdminAction({
+          adminId: req.user.id,
+          action: "inspection.status_changed",
+          targetType: "inspection_booking",
+          targetId: req.params.id,
+          details: { new_status: req.body.status },
+        });
+      } catch (logErr) {
+        console.error("Failed to write audit log entry:", logErr);
+      }
+
       return res.json({ data: rows[0] });
     } catch (err) {
       if (err.code === "23505") return res.status(409).json({ error: "That time is already booked for this property." });
@@ -429,6 +522,51 @@ router.patch(
     }
   }
 );
+
+// GET /api/admin/audit-log
+// Every logged admin action (verify/reject, role changes, deletions,
+// post publishing), newest first. Optionally filtered to one target
+// (e.g. ?target_type=property&target_id=42) to see everything that's
+// happened to one specific record.
+router.get("/audit-log", async (req, res, next) => {
+  try {
+    const { target_type, target_id } = req.query;
+    const { page, limit, offset } = parsePagination(req.query, { defaultLimit: 50, maxLimit: 100 });
+
+    const conditions = [];
+    if (target_type) conditions.push(db.sql`a.target_type = ${target_type}`);
+    if (target_id) conditions.push(db.sql`a.target_id = ${String(target_id)}`);
+
+    const whereClause = conditions.reduce(
+      (query, condition, index) =>
+        index === 0 ? db.sql`WHERE ${condition}` : db.sql`${query} AND ${condition}`,
+      db.sql``
+    );
+
+    const countRows = await db.sql`
+      SELECT COUNT(*)::int AS count
+      FROM admin_actions a
+      ${whereClause}
+    `;
+
+    const rows = await db.sql`
+      SELECT a.*, u.name AS admin_name, u.email AS admin_email
+      FROM admin_actions a
+      LEFT JOIN users u ON u.id = a.admin_id
+      ${whereClause}
+      ORDER BY a.created_at DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
+    `;
+
+    return res.json({
+      data: rows,
+      pagination: paginationMeta(page, limit, countRows[0]?.count || 0),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 // --------------------------------------------------
 // Blog post management
@@ -470,6 +608,10 @@ async function uniqueSlug(base, ignoreId = null) {
 // All posts, including drafts
 router.get("/posts", async (req, res, next) => {
   try {
+    const { page, limit, offset } = parsePagination(req.query, { defaultLimit: 100, maxLimit: 100 });
+
+    const countRows = await db.sql`SELECT COUNT(*)::int AS count FROM posts`;
+
     const rows = await db.sql`
       SELECT
         p.*,
@@ -478,10 +620,13 @@ router.get("/posts", async (req, res, next) => {
       JOIN users u
         ON u.id = p.author_id
       ORDER BY p.created_at DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
     `;
 
     return res.json({
       data: rows.map(parsePost),
+      pagination: paginationMeta(page, limit, countRows[0]?.count || 0),
     });
   } catch (err) {
     next(err);
@@ -561,6 +706,18 @@ router.post(
         WHERE p.id = ${post.id}
         LIMIT 1
       `;
+
+      try {
+        await logAdminAction({
+          adminId: req.user.id,
+          action: "post.created",
+          targetType: "post",
+          targetId: post.id,
+          details: { title, published: !!published },
+        });
+      } catch (logErr) {
+        console.error("Failed to write audit log entry:", logErr);
+      }
 
       return res.status(201).json({
         data: parsePost(result[0]),
@@ -694,6 +851,18 @@ router.put(
         LIMIT 1
       `;
 
+      try {
+        await logAdminAction({
+          adminId: req.user.id,
+          action: "post.updated",
+          targetType: "post",
+          targetId: req.params.id,
+          details: { published: nextPublished },
+        });
+      } catch (logErr) {
+        console.error("Failed to write audit log entry:", logErr);
+      }
+
       return res.json({
         data: parsePost(rows[0]),
       });
@@ -713,7 +882,7 @@ router.delete(
       }
 
       const existingRows = await db.sql`
-        SELECT id
+        SELECT id, title
         FROM posts
         WHERE id = ${req.params.id}
         LIMIT 1
@@ -729,6 +898,18 @@ router.delete(
         DELETE FROM posts
         WHERE id = ${req.params.id}
       `;
+
+      try {
+        await logAdminAction({
+          adminId: req.user.id,
+          action: "post.deleted",
+          targetType: "post",
+          targetId: req.params.id,
+          details: { title: existingRows[0].title },
+        });
+      } catch (logErr) {
+        console.error("Failed to write audit log entry:", logErr);
+      }
 
       return res.status(204).send();
     } catch (err) {

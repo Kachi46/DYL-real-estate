@@ -594,6 +594,8 @@ button { font-family: inherit; cursor: pointer; }
 .admin-toolbar select { border: 1px solid var(--line); border-radius: var(--radius-md); padding: 0.55rem 0.75rem; font-size: 0.85rem; background: #fff; }
 
 .data-table-wrap { margin-top: 1.5rem; border: 1px solid var(--line); background: #fff; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.pagination-bar { display: flex; align-items: center; justify-content: center; gap: 1rem; padding: 1rem; }
+.pagination-info { font-size: 0.875rem; color: var(--forest-500, #667); }
 table.data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
 table.data-table thead { background: var(--forest-50); border-bottom: 1px solid var(--line); }
 table.data-table th { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--forest-500); padding: 0.8rem 1.1rem; font-weight: 600; }
@@ -636,6 +638,11 @@ table.data-table .row-sub { font-size: 0.75rem; color: var(--forest-400); margin
 .post-editor { margin-top: 1.5rem; max-width: 42rem; display: flex; flex-direction: column; gap: 1.1rem;
   border: 1px solid var(--line); background: #fff; border-radius: var(--radius-lg); padding: 1.6rem; box-shadow: var(--shadow-sm); }
 .post-editor textarea { min-height: 12rem; resize: vertical; }
+.post-editor-preview { border: 1px solid var(--line); background: #fff; border-radius: var(--radius-md, 8px); padding: 1rem; min-height: 8rem; line-height: 1.7; }
+.post-editor-preview p { margin: 0 0 1em; }
+.post-editor-preview h1, .post-editor-preview h2, .post-editor-preview h3 { margin: 1em 0 0.5em; }
+.post-editor-preview ul, .post-editor-preview ol { padding-left: 1.4em; margin: 0 0 1em; }
+.post-editor-preview a { color: var(--gold-600, #b8860b); }
 .checkbox-field { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 500; color: var(--forest-800); }
 .editor-actions { display: flex; gap: 0.5rem; }
 

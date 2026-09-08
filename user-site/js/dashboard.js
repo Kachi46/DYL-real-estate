@@ -4,6 +4,10 @@ if (!Api.getToken()) {
 
 let myListings = [];
 let mySaved = [];
+let listingsPagination = null;
+let savedPagination = null;
+let listingsPage = 1;
+let savedPage = 1;
 
 const tabs = ["listings", "saved", "add"];
 
@@ -22,7 +26,7 @@ tabs.forEach((t) => {
 });
 
 function renderListings() {
-  document.getElementById("tab-listings").textContent = `My Listings (${myListings.length})`;
+  document.getElementById("tab-listings").textContent = `My Listings (${listingsPagination?.total ?? myListings.length})`;
   const panel = document.getElementById("panel-listings");
   if (myListings.length === 0) {
     panel.innerHTML = `
@@ -39,11 +43,15 @@ function renderListings() {
         ${Util.propertyCardHtml(p)}
       </div>
     `)
-    .join("")}</div>`;
+    .join("")}</div>${Util.paginationBar(listingsPagination)}`;
+  Util.wirePagination(panel, (page) => {
+    listingsPage = page;
+    refreshListings();
+  });
 }
 
 function renderSaved() {
-  document.getElementById("tab-saved").textContent = `Saved (${mySaved.length})`;
+  document.getElementById("tab-saved").textContent = `Saved (${savedPagination?.total ?? mySaved.length})`;
   const panel = document.getElementById("panel-saved");
   if (mySaved.length === 0) {
     panel.innerHTML = `
@@ -53,19 +61,67 @@ function renderSaved() {
       </div>`;
     return;
   }
-  panel.innerHTML = `<div class="property-grid">${mySaved.map(Util.propertyCardHtml).join("")}</div>`;
+  panel.innerHTML = `<div class="property-grid">${mySaved.map(Util.propertyCardHtml).join("")}</div>${Util.paginationBar(savedPagination)}`;
+  Util.wirePagination(panel, (page) => {
+    savedPage = page;
+    refreshSaved();
+  });
+}
+
+function renderVerifyBanner(user) {
+  const el = document.getElementById("verify-banner");
+  if (!el) return;
+  if (!user || user.email_verified) {
+    el.innerHTML = "";
+    return;
+  }
+  el.innerHTML = `
+    <p class="alert alert-info" style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+      Please verify your email address.
+      <button class="btn btn-outline" id="resend-verify-btn" style="padding:.25rem .75rem;">Resend verification email</button>
+    </p>`;
+  document.getElementById("resend-verify-btn").addEventListener("click", async (event) => {
+    const btn = event.currentTarget;
+    btn.disabled = true;
+    try {
+      const result = await Api.post("/auth/resend-verification");
+      btn.parentElement.textContent = result.message;
+    } catch (err) {
+      btn.disabled = false;
+    }
+  });
+}
+
+async function refreshListings() {
+  const res = await Api.get("/properties/me/listings", { page: listingsPage });
+  if (res.data.length === 0 && listingsPage > 1 && res.pagination?.total > 0) {
+    listingsPage -= 1;
+    return refreshListings();
+  }
+  myListings = res.data;
+  listingsPagination = res.pagination;
+  renderListings();
+}
+
+async function refreshSaved() {
+  const res = await Api.get("/properties/me/saved", { page: savedPage });
+  if (res.data.length === 0 && savedPage > 1 && res.pagination?.total > 0) {
+    savedPage -= 1;
+    return refreshSaved();
+  }
+  mySaved = res.data;
+  savedPagination = res.pagination;
+  renderSaved();
 }
 
 async function refreshData() {
   try {
-    const [listingsRes, savedRes] = await Promise.all([
-      Api.get("/properties/me/listings"),
-      Api.get("/properties/me/saved"),
+    const [, , meRes] = await Promise.all([
+      refreshListings(),
+      refreshSaved(),
+      Api.get("/auth/me"),
     ]);
-    myListings = listingsRes.data;
-    mySaved = savedRes.data;
-    renderListings();
-    renderSaved();
+    renderVerifyBanner(meRes.user);
   } catch (err) {
     if (err.status === 401) {
       Api.clearToken();

@@ -1,7 +1,13 @@
+let currentInspectionsPage = 1;
+
 async function loadInspections() {
   const table = document.getElementById("inspections-table");
   try {
-    const result = await Api.get("/admin/inspections");
+    const result = await Api.get("/admin/inspections", { page: currentInspectionsPage });
+    if (result.data.length === 0 && currentInspectionsPage > 1 && result.pagination?.total > 0) {
+      currentInspectionsPage -= 1;
+      return loadInspections();
+    }
     if (result.data.length === 0) {
       table.innerHTML = '<p class="loading-text" style="padding:1.5rem;">No inspection requests yet.</p>';
       return;
@@ -13,7 +19,8 @@ async function loadInspections() {
         <td>${new Date(`${item.inspection_date}T${item.inspection_time}`).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</td>
         <td><span class="status-pill status-${Util.escapeHtml(item.status)}">${Util.escapeHtml(item.status)}</span></td>
         <td class="actions">${item.status !== "confirmed" ? `<button class="pill-btn pill-btn-primary" data-status="confirmed" data-id="${item.id}">Confirm</button>` : ""}${item.status !== "cancelled" ? `<button class="pill-btn pill-btn-danger-outline" data-status="cancelled" data-id="${item.id}">Cancel</button>` : ""}</td>
-      </tr>`).join("")}</tbody></table>`;
+      </tr>`).join("")}</tbody></table>${Util.paginationBar(result.pagination)}`;
+    Util.wirePagination(table, (page) => { currentInspectionsPage = page; loadInspections(); });
     table.querySelectorAll("button[data-status]").forEach((button) => button.addEventListener("click", async () => {
       button.disabled = true;
       try { await Api.patch(`/admin/inspections/${button.dataset.id}`, { status: button.dataset.status }); loadInspections(); }

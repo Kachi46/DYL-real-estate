@@ -70,18 +70,35 @@ URLs to lock it down.
 - Users — promote/demote admin role, delete accounts
 
 **API** — full REST backend in `backend/`, Postgres, JWT auth, bcrypt
-password hashing, input validation on every write endpoint. Full setup and
-endpoint reference in `backend/README.md`.
+password hashing, input validation on every write endpoint. Interactive
+API docs at `/api/docs` once it's running; setup instructions in
+`backend/README.md`.
 
 **On-page connection check** — every page in both sites pings the backend
 on load and shows a visible red banner if it can't connect, naming the
 exact URL it tried. No browser console needed to notice the backend isn't
 running.
 
-## Verified test pass
+## Testing
 
-Before this was packaged, every flow below was exercised against a live
-server (not just read — actually run):
+The backend has an automated test suite (Jest + Supertest, a fully
+in-memory mock database — no live Postgres needed to run it):
+
+```bash
+cd backend
+npm test        # 90 tests: auth, properties, admin, posts, rate
+                 # limiting, account lockout, password policy, audit
+                 # log, API docs endpoints
+npm run lint     # ESLint
+```
+
+Both run in CI on every push (see `.github/workflows/backend-ci.yml`).
+
+Beyond that, before this was packaged, every flow below was also
+exercised by hand against a live server (not just read — actually run),
+covering things the automated suite doesn't touch (static asset
+serving, CORS from a real browser origin, the on-page connection-check
+banner):
 
 - [x] Register → login → token persists → `/auth/me` round-trips
 - [x] Browse/filter/paginate listings; verified-only filter
@@ -136,6 +153,28 @@ backend separately first (see `backend/README.md`), then:
    backend's environment variables to your new `*.github.io` URL(s), so
    CORS allows requests from it (see "Why CORS won't get in your way"
    above — the default wide-open CORS is meant for local dev only).
+
+## Known limitations
+
+Honest gaps, so nobody has to rediscover these the hard way:
+
+- **No real image upload.** Listing photos are pasted comma-separated
+  URLs (external hosting required) — there's no file-upload endpoint or
+  storage integration (S3/Cloudinary/etc). The biggest remaining
+  usability gap for actual landlords/agents.
+- **Automated tests cover the backend only** (90 Jest/Supertest tests —
+  see [Testing](#testing)). There's no automated frontend or end-to-end
+  test suite; frontend correctness relies on the manual pass documented
+  above plus `node --check` for syntax.
+- **The public property search (`GET /properties`) filters aren't
+  independently load-tested** — correctness is covered by the test
+  suite, but there's no performance testing against a large dataset.
+- **Frontend pagination is Prev/Next only** — no jump-to-page, no
+  configurable page size in the UI (the backend supports both via `page`
+  and `limit` query params; the UI just doesn't expose them).
+- **No OpenAPI examples for every field** — the spec at `/api/docs`
+  documents shapes and constraints thoroughly but doesn't include a
+  worked example payload for every single endpoint.
 
 ## If something doesn't work
 

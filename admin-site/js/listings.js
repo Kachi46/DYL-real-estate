@@ -4,6 +4,7 @@ function statusFromUrl() {
 
 let rejectingId = null;
 let viewingMapId = null;
+let currentPage = 1;
 
 function mapUrlForProperty(property) {
   const query = property.latitude != null && property.longitude != null
@@ -19,14 +20,18 @@ async function loadListings() {
   table.innerHTML = `<p class="loading-text" style="padding:1.5rem;">Loading…</p>`;
 
   try {
-    const res = await Api.get("/admin/properties", status ? { verification_status: status } : {});
-    renderTable(res.data);
+    const res = await Api.get("/admin/properties", { verification_status: status || undefined, page: currentPage });
+    if (res.data.length === 0 && currentPage > 1 && res.pagination?.total > 0) {
+      currentPage -= 1;
+      return loadListings();
+    }
+    renderTable(res.data, res.pagination);
   } catch (err) {
     table.innerHTML = `<p class="loading-text" style="padding:1.5rem;">Couldn't load listings.</p>`;
   }
 }
 
-function renderTable(properties) {
+function renderTable(properties, pagination) {
   const table = document.getElementById("listings-table");
   if (properties.length === 0) {
     table.innerHTML = `<p class="loading-text" style="padding:1.5rem;">No listings match this filter.</p>`;
@@ -80,7 +85,13 @@ function renderTable(properties) {
       </thead>
       <tbody>${rows}</tbody>
     </table>
+    ${Util.paginationBar(pagination)}
   `;
+
+  Util.wirePagination(table, (page) => {
+    currentPage = page;
+    loadListings();
+  });
 
   table.querySelectorAll("button[data-action]").forEach((btn) => {
     const id = Number(btn.dataset.id);

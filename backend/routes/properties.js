@@ -2,7 +2,10 @@ const express = require("express");
 const { body, validationResult } = require("express-validator");
 const db = require("../db");
 const { authenticate, optionalAuth } = require("../middleware/auth");
+const { publicWriteLimiter } = require("../middleware/rateLimit");
 const { extractYouTubeId } = require("../lib/youtube");
+const { notifyNewInquiry, notifyNewInspectionRequest } = require("../lib/notifications");
+const { parsePagination, paginationMeta } = require("../lib/pagination");
 
 const router = express.Router();
 
@@ -664,6 +667,14 @@ router.post("/:id/save", authenticate, async (req, res, next) => {
 // Current user's saved listings
 router.get("/me/saved", authenticate, async (req, res, next) => {
   try {
+    const { page, limit, offset } = parsePagination(req.query, { defaultLimit: 100, maxLimit: 100 });
+
+    const countRows = await db.sql`
+      SELECT COUNT(*)::int AS count
+      FROM saved_properties
+      WHERE user_id = ${req.user.id}
+    `;
+
     const rows = await db.sql`
       SELECT p.*
       FROM properties p
@@ -671,10 +682,13 @@ router.get("/me/saved", authenticate, async (req, res, next) => {
         ON sp.property_id = p.id
       WHERE sp.user_id = ${req.user.id}
       ORDER BY sp.created_at DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
     `;
 
     return res.json({
       data: rows.map(parseProperty),
+      pagination: paginationMeta(page, limit, countRows[0]?.count || 0),
     });
   } catch (err) {
     next(err);
@@ -688,15 +702,26 @@ router.get(
   authenticate,
   async (req, res, next) => {
     try {
+      const { page, limit, offset } = parsePagination(req.query, { defaultLimit: 100, maxLimit: 100 });
+
+      const countRows = await db.sql`
+        SELECT COUNT(*)::int AS count
+        FROM properties
+        WHERE owner_id = ${req.user.id}
+      `;
+
       const rows = await db.sql`
         SELECT *
         FROM properties
         WHERE owner_id = ${req.user.id}
         ORDER BY created_at DESC
+        LIMIT ${limit}
+        OFFSET ${offset}
       `;
 
       return res.json({
         data: rows.map(parseProperty),
+        pagination: paginationMeta(page, limit, countRows[0]?.count || 0),
       });
     } catch (err) {
       next(err);
@@ -708,6 +733,7 @@ router.get(
 // Send an inquiry about a listing
 router.post(
   "/:id/inquiries",
+  publicWriteLimiter,
   optionalAuth,
   [
     body("name").trim().notEmpty(),
@@ -729,9 +755,10 @@ router.post(
       }
 
       const propertyRows = await db.sql`
-        SELECT id
-        FROM properties
-        WHERE id = ${req.params.id}
+        SELECT p.id, p.title, u.email AS owner_email, u.name AS owner_name
+        FROM properties p
+        JOIN users u ON u.id = p.owner_id
+        WHERE p.id = ${req.params.id}
         LIMIT 1
       `;
 
@@ -767,6 +794,19 @@ router.post(
         )
       `;
 
+      // Best-effort: the inquiry itself is already saved and visible in
+      // the owner's dashboard regardless of whether this email arrives.
+      try {
+        await notifyNewInquiry({
+          ownerEmail: propertyRows[0].owner_email,
+          ownerName: propertyRows[0].owner_name,
+          listingTitle: propertyRows[0].title,
+          inquiry: { name, email, phone, message },
+        });
+      } catch (emailErr) {
+        console.error("Failed to send new-inquiry notification:", emailErr);
+      }
+
       return res.status(201).json({
         message: "Inquiry sent successfully.",
       });
@@ -780,6 +820,7 @@ router.post(
 // Request an inspection slot for a listing
 router.post(
   "/:id/inspections",
+  publicWriteLimiter,
   optionalAuth,
   [
     body("name").trim().notEmpty().withMessage("Name is required."),
@@ -799,9 +840,10 @@ router.post(
       if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
 
       const propertyRows = await db.sql`
-        SELECT id, title, city, state
-        FROM properties
-        WHERE id = ${req.params.id} AND status = ${"active"}
+        SELECT p.id, p.title, p.city, p.state, u.email AS owner_email, u.name AS owner_name
+        FROM properties p
+        JOIN users u ON u.id = p.owner_id
+        WHERE p.id = ${req.params.id} AND p.status = ${"active"}
         LIMIT 1
       `;
       if (propertyRows.length === 0) return res.status(404).json({ error: "Property not found." });
@@ -834,8 +876,30 @@ router.post(
         RETURNING id, inspection_date, inspection_time, status
       `;
 
+      const { owner_email, owner_name, ...propertySummary } = propertyRows[0];
+
+      // Best-effort: the booking itself is already saved regardless of
+      // whether this email arrives.
+      try {
+        await notifyNewInspectionRequest({
+          ownerEmail: owner_email,
+          ownerName: owner_name,
+          listingTitle: propertySummary.title,
+          booking: {
+            name: req.body.name,
+            email: req.body.email,
+            phone: req.body.phone,
+            inspection_date: req.body.inspection_date,
+            inspection_time: req.body.inspection_time,
+            notes: req.body.notes,
+          },
+        });
+      } catch (emailErr) {
+        console.error("Failed to send new-inspection notification:", emailErr);
+      }
+
       return res.status(201).json({
-        data: { ...rows[0], property: propertyRows[0] },
+        data: { ...rows[0], property: propertySummary },
         message: "Inspection request submitted successfully.",
       });
     } catch (err) {

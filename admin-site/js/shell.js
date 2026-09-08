@@ -43,6 +43,7 @@ const NAV_ITEMS = [
   { href: "inspections.html", label: "Inspections", match: "inspections" },
   { href: "posts.html", label: "Blog", match: "posts" },
   { href: "users.html", label: "Users", match: "users" },
+  { href: "audit-log.html", label: "Audit Log", match: "audit-log" },
   { href: "profile.html", label: "Edit Profile", match: "profile" },
 ];
 

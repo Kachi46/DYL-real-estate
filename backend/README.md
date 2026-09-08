@@ -60,28 +60,29 @@ lets you open the static site with VS Code's Live Server (or anything else)
 without a CORS error. Before deploying somewhere real, uncomment those two
 lines in `.env` and set them to your actual frontend URLs to lock it down.
 
-## Endpoints
+## API documentation
 
-| Method | Path | Auth | Purpose |
-|---|---|---|---|
-| POST | `/api/auth/register` | — | Create an account |
-| POST | `/api/auth/login` | — | Log in, returns JWT |
-| GET | `/api/auth/me` | user | Current user from token |
-| GET | `/api/properties` | — | Search/filter/paginate active listings |
-| GET | `/api/properties/:id` | — | Listing detail |
-| POST | `/api/properties` | user | Create a listing (starts "pending") |
-| PUT/DELETE | `/api/properties/:id` | owner/admin | Edit or remove a listing |
-| POST | `/api/properties/:id/save` | user | Toggle save/unsave |
-| GET | `/api/properties/me/listings` \| `/me/saved` | user | Your listings / saved list |
-| POST | `/api/properties/:id/inquiries` | — | Contact a seller |
-| GET | `/api/posts` | — | Published blog posts, paginated |
-| GET | `/api/posts/:slug` | — | Single published post |
-| GET | `/api/admin/stats` | admin | Dashboard counts |
-| GET | `/api/admin/properties` | admin | All listings, any status |
-| PATCH | `/api/admin/properties/:id/verify` | admin | Approve/reject a title |
-| GET/POST | `/api/admin/posts` | admin | List all posts (incl. drafts) / create |
-| PUT/DELETE | `/api/admin/posts/:id` | admin | Edit, publish/unpublish, or remove a post |
-| GET/PATCH/DELETE | `/api/admin/users...` | admin | Manage accounts |
+Full interactive reference — every endpoint, request/response shapes,
+auth requirements, and a "try it" console — is served by the API itself:
+
+```
+http://localhost:4000/api/docs           # interactive Swagger UI
+http://localhost:4000/api/openapi.json   # raw OpenAPI 3.0 spec
+```
+
+The source is `docs/openapi.yaml`; update it alongside any route change
+so it never drifts out of sync the way a hand-maintained endpoint table
+(what used to be here) eventually does.
+
+A few highlights, if you just need the shape of things before diving into
+the full docs:
+
+| Area | Base path | Auth |
+|---|---|---|
+| Auth (register/login/password reset/email verification/Google) | `/api/auth` | mixed — see docs |
+| Properties (public search, owner CRUD, save, inquire, book inspection) | `/api/properties` | mixed — see docs |
+| Blog (public, published-only) | `/api/posts` | none |
+| Admin (listings review, users, inspections, blog, audit log) | `/api/admin` | admin only |
 
 ## Data
 

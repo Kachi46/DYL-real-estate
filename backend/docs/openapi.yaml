@@ -1,0 +1,1298 @@
+openapi: 3.0.3
+info:
+  title: DYL Real-Estate Services API
+  description: >
+    Admin-verified real estate listings API (Lagos-first, Nigeria). Three
+    roles share this API: **seekers** (browse/save/inquire, the default
+    `role` on every account), **owners** (list/manage their own
+    properties — a seeker becomes an owner the moment they create a
+    listing), and **admins** (`role: admin`) who review and verify
+    listings and moderate the platform.
+
+    Authentication is a bearer JWT returned by `/auth/login`,
+    `/auth/register`, or `/auth/google`. Send it as
+    `Authorization: Bearer <token>` on every authenticated request.
+    Tokens are invalidated (not just expired) when the account's
+    password changes — see `token_version` under Auth below.
+  version: "1.0.0"
+servers:
+  - url: /api
+    description: Relative to wherever this API is deployed (see README for
+      environment-specific base URLs).
+
+tags:
+  - name: Auth
+    description: Registration, login, password reset, email verification.
+  - name: Properties
+    description: Public search plus owner-managed listings, saves, inquiries,
+      and inspection bookings.
+  - name: Posts
+    description: Public blog (published posts only).
+  - name: Admin
+    description: >
+      Everything under `/admin` requires an admin-role token
+      (`Authorization: Bearer <token>` where the token's `role` claim is
+      `admin`). All Admin endpoints return 401 with no token and 403 for
+      a non-admin token.
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Obtained from `/auth/login`, `/auth/register`, or `/auth/google`.
+        Carries `id`, `role`, `email`, `name`, and `token_version` — the
+        last of which is checked against the user's current value on
+        every request, so it's what lets a password change or reset
+        immediately invalidate every previously-issued token rather than
+        waiting out the token's natural expiry.
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+      description: 1-indexed page number.
+    LimitParam:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1 }
+      description: Items per page. Each endpoint clamps this to its own
+        maximum (see that endpoint's description) regardless of what's
+        requested.
+
+  responses:
+    BadRequest:
+      description: Validation failed.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Unauthorized:
+      description: Missing, invalid, expired, or revoked token.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Forbidden:
+      description: Authenticated, but not allowed to perform this action
+        (e.g. a non-admin calling an Admin endpoint, or a non-owner
+        editing someone else's listing).
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: No resource with that ID/slug exists (or it exists but
+        is deliberately hidden from this caller, e.g. a rejected listing
+        shown as 404 to the public).
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    TooManyRequests:
+      description: Rate limited. Sensitive auth endpoints (login, register,
+        password reset, etc) and public write endpoints (inquiries,
+        inspection requests) are IP-rate-limited on top of any
+        account-level lockout.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Locked:
+      description: Account temporarily locked after repeated failed login
+        attempts (independent of, and in addition to, the IP-based rate
+        limit above). Try again after the cooldown named in the error
+        message.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error: { type: string, example: "Invalid email or password." }
+
+    Pagination:
+      type: object
+      properties:
+        page: { type: integer, example: 1 }
+        limit: { type: integer, example: 20 }
+        total: { type: integer, example: 47 }
+        totalPages: { type: integer, example: 3 }
+
+    User:
+      type: object
+      description: Never includes `password_hash` — every endpoint that
+        returns a user strips it before responding.
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        first_name: { type: string }
+        last_name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string, nullable: true }
+        role: { type: string, enum: [user, admin] }
+        user_type: { type: string, enum: [user, landlord, agent, developer] }
+        email_verified: { type: boolean }
+        email_opt_in: { type: boolean }
+        created_at: { type: string, format: date-time }
+
+    Property:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: string }
+        property_type: { type: string, enum: [land, residential, commercial] }
+        listing_type: { type: string, enum: [sale, rent] }
+        price: { type: number }
+        currency: { type: string, example: "NGN" }
+        state: { type: string }
+        city: { type: string }
+        address: { type: string, nullable: true }
+        latitude: { type: number, nullable: true }
+        longitude: { type: number, nullable: true }
+        size_sqm: { type: number, nullable: true }
+        bedrooms: { type: integer, nullable: true }
+        bathrooms: { type: integer, nullable: true }
+        images:
+          type: array
+          items: { type: string, format: uri }
+          description: Externally-hosted image URLs (no upload endpoint —
+            see README's "known limitations").
+        title_document: { type: string, nullable: true }
+        video_id: { type: string, nullable: true }
+        youtube_watch_url: { type: string, nullable: true, readOnly: true }
+        youtube_thumbnail_url: { type: string, nullable: true, readOnly: true }
+        owner_id: { type: integer }
+        status: { type: string, enum: [active, sold, removed] }
+        verification_status: { type: string, enum: [pending, verified, rejected] }
+        verification_notes:
+          type: string
+          nullable: true
+          description: Set by an admin on rejection; internal (owner/admin
+            visible), not shown to the public.
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    PropertyCreate:
+      type: object
+      required: [title, description, property_type, price, state, city]
+      properties:
+        title: { type: string }
+        description: { type: string }
+        property_type: { type: string, enum: [land, residential, commercial] }
+        listing_type: { type: string, enum: [sale, rent], default: sale }
+        price: { type: number, minimum: 0 }
+        currency: { type: string, default: "NGN" }
+        state: { type: string }
+        city: { type: string }
+        address: { type: string }
+        latitude: { type: number, minimum: -90, maximum: 90 }
+        longitude: { type: number, minimum: -180, maximum: 180 }
+        size_sqm: { type: number }
+        bedrooms: { type: integer }
+        bathrooms: { type: integer }
+        images: { type: array, items: { type: string, format: uri } }
+        title_document: { type: string }
+        video_url:
+          type: string
+          description: A YouTube link; validated and converted to a
+            `video_id` server-side (whatever isn't a real YouTube URL
+            gets rejected with 400).
+
+    Post:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        slug: { type: string }
+        excerpt: { type: string, nullable: true }
+        content:
+          type: string
+          description: Markdown. Rendered client-side with `marked` +
+            `DOMPurify` — never trust this as pre-sanitized HTML if you
+            consume it elsewhere.
+        cover_image: { type: string, nullable: true }
+        published: { type: boolean }
+        published_at: { type: string, format: date-time, nullable: true }
+        author_name: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    Inquiry:
+      type: object
+      properties:
+        id: { type: integer }
+        property_id: { type: integer }
+        user_id: { type: integer, nullable: true }
+        name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string, nullable: true }
+        message: { type: string }
+        created_at: { type: string, format: date-time }
+
+    InspectionBooking:
+      type: object
+      properties:
+        id: { type: integer }
+        property_id: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        inspection_date: { type: string, format: date }
+        inspection_time: { type: string, example: "14:30" }
+        notes: { type: string, nullable: true }
+        status: { type: string, enum: [pending, confirmed, cancelled] }
+
+    AdminActionLogEntry:
+      type: object
+      description: One row from the audit trail (`GET /admin/audit-log`).
+      properties:
+        id: { type: integer }
+        admin_id: { type: integer, nullable: true }
+        admin_name: { type: string, nullable: true }
+        admin_email: { type: string, nullable: true }
+        action:
+          type: string
+          enum:
+            - property.verification_status_changed
+            - user.role_changed
+            - user.deleted
+            - inspection.status_changed
+            - post.created
+            - post.updated
+            - post.deleted
+        target_type:
+          type: string
+          enum: [property, user, inspection_booking, post]
+        target_id: { type: string }
+        details:
+          type: object
+          nullable: true
+          description: >
+            Action-specific extra context, e.g.
+            `{ "verification_status": "rejected", "verification_notes": "..." }`.
+        created_at: { type: string, format: date-time }
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Create an account
+      description: Rate-limited (IP-based). Sends a verification email
+        (best-effort — a delivery failure doesn't fail registration
+        itself; see `/auth/resend-verification`).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [first_name, last_name, email, password]
+              properties:
+                first_name: { type: string }
+                last_name: { type: string }
+                email: { type: string, format: email }
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 72
+                  description: >
+                    Also rejected: well-known common passwords, and
+                    anything containing the account's own name or email
+                    local-part.
+                user_type: { type: string, enum: [user, landlord, agent, developer] }
+                phone: { type: string }
+                email_opt_in: { type: boolean }
+      responses:
+        "201":
+          description: Account created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  user: { $ref: "#/components/schemas/User" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409":
+          description: Email already registered.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in
+      description: >
+        IP rate-limited AND account-level-locked: 5 failed attempts on
+        the *same account* locks it for 15 minutes regardless of which
+        IPs the attempts came from — a second, independent layer on top
+        of the IP limiter, since the IP limiter alone doesn't stop a
+        distributed attempt against one specific account.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        "200":
+          description: Logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  user: { $ref: "#/components/schemas/User" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401":
+          description: Wrong email or password. Deliberately identical
+            whether the email doesn't exist or the password is wrong —
+            and never reveals how many attempts remain, since that would
+            help an attacker time around the lockout.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "423": { $ref: "#/components/responses/Locked" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get the current user
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: "#/components/schemas/User" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /auth/change-password:
+    post:
+      tags: [Auth]
+      summary: Change password (while logged in)
+      description: Bumps `token_version`, invalidating every other token
+        issued before this point (e.g. a session left open on another
+        device) — then immediately re-signs a fresh token for *this*
+        request so the caller isn't logged out of their own session.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_password, new_password]
+              properties:
+                current_password: { type: string }
+                new_password:
+                  type: string
+                  minLength: 8
+                  maxLength: 72
+                  description: Same policy as registration - also rejected
+                    if it's a well-known common password or contains the
+                    account's own name or email.
+      responses:
+        "200":
+          description: Changed. Returns a new token — the old one is now
+            rejected by every other endpoint.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  token: { type: string }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401":
+          description: Not authenticated, or `current_password` is wrong.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Request a password reset email
+      description: Always returns the same generic message whether or not
+        the email exists, so this endpoint can't be used to enumerate
+        registered accounts.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        "200":
+          description: Generic confirmation (see description above).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { message: { type: string } }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Complete a password reset
+      description: Also bumps `token_version`, so any token issued before
+        the reset stops working — the account owner has to log in fresh.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, new_password]
+              properties:
+                token: { type: string, description: From the emailed reset link. }
+                new_password:
+                  type: string
+                  minLength: 8
+                  maxLength: 72
+                  description: Same policy as registration - also rejected
+                    if it's a well-known common password or contains the
+                    account's own name or email.
+      responses:
+        "200":
+          description: Password reset.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { message: { type: string } }
+        "400":
+          description: Token is invalid, already used, or expired (1 hour).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/verify-email:
+    post:
+      tags: [Auth]
+      summary: Confirm an email address
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token: { type: string, description: From the emailed verification link. }
+      responses:
+        "200":
+          description: Verified.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { message: { type: string } }
+        "400":
+          description: Token is invalid, already used, or expired (24 hours).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/resend-verification:
+    post:
+      tags: [Auth]
+      summary: Resend the verification email
+      responses:
+        "200":
+          description: Sent (or already verified — same 200, message differs).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { message: { type: string } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /auth/google:
+    post:
+      tags: [Auth]
+      summary: Sign in (or register) with Google
+      description: Verifies the ID token directly against Google rather
+        than doing JWT signature verification locally. An account
+        created or linked this way is auto-marked `email_verified`,
+        since Google already confirmed the address.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [credential]
+              properties:
+                credential: { type: string, description: The Google ID token. }
+      responses:
+        "200":
+          description: Signed in / account created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  user: { $ref: "#/components/schemas/User" }
+        "401":
+          description: Google couldn't verify the token.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "503":
+          description: Google sign-in isn't configured on this deployment
+            (`GOOGLE_CLIENT_ID` unset).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /properties:
+    get:
+      tags: [Properties]
+      summary: Search public listings
+      description: Always excludes `status != active` and
+        `verification_status = rejected` — a rejected listing is never
+        publicly visible regardless of other filters. Page size caps at 50.
+      security: []
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string }
+          description: Free-text search across title, description, city, state.
+        - name: state
+          in: query
+          schema: { type: string }
+        - name: city
+          in: query
+          schema: { type: string }
+        - name: property_type
+          in: query
+          schema: { type: string, enum: [land, residential, commercial] }
+        - name: listing_type
+          in: query
+          schema: { type: string, enum: [sale, rent] }
+        - name: min_price
+          in: query
+          schema: { type: number }
+        - name: max_price
+          in: query
+          schema: { type: number }
+        - name: verified_only
+          in: query
+          schema: { type: boolean }
+        - name: has_video
+          in: query
+          schema: { type: boolean }
+        - $ref: "#/components/parameters/PageParam"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 50, default: 12 }
+      responses:
+        "200":
+          description: OK — possibly an empty `data` array; never an error
+            for "no matches".
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Property" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+    post:
+      tags: [Properties]
+      summary: Create a listing
+      description: Owned by the authenticated caller; always starts
+        `verification_status = pending` regardless of what's sent.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PropertyCreate" }
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Property" } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /properties/market/movers:
+    get:
+      tags: [Properties]
+      summary: Recent price gainers/losers
+      description: Computed from recorded `price_history` — only listings
+        with an actual documented price change appear here.
+      security: []
+      parameters:
+        - name: days
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 365, default: 90 }
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema: { type: object }
+
+  /properties/me/listings:
+    get:
+      tags: [Properties]
+      summary: The current user's own listings
+      description: Includes the caller's own pending/rejected listings
+        (unlike the public search, which hides those). Max page size 100.
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 100 }
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Property" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /properties/me/saved:
+    get:
+      tags: [Properties]
+      summary: The current user's saved listings
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 100 }
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Property" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /properties/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer }
+    get:
+      tags: [Properties]
+      summary: Get one listing
+      description: A pending listing is visible to anyone; a rejected one
+        is only visible to its owner or an admin (404 for everyone else,
+        including "does this ID exist" — no distinction is made between
+        "doesn't exist" and "exists but you can't see it").
+      security: []
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Property" } }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [Properties]
+      summary: Update a listing
+      description: Owner or admin only. When a **non-admin** edits a
+        `verified` listing, `verification_status` is automatically reset
+        to `pending` — any edit re-queues it for review. An admin's edits
+        never trigger that reset.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PropertyCreate" }
+      responses:
+        "200":
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Property" } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403":
+          description: Authenticated, but not this listing's owner (and not an admin).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Properties]
+      summary: Delete a listing
+      description: Owner or admin only.
+      responses:
+        "204": { description: Deleted. }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403":
+          description: Authenticated, but not this listing's owner (and not an admin).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /properties/{id}/save:
+    post:
+      tags: [Properties]
+      summary: Toggle save/unsave
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Toggled.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { saved: { type: boolean } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /properties/{id}/inquiries:
+    post:
+      tags: [Properties]
+      summary: Send an inquiry about a listing
+      description: Public (login optional — if authenticated, the inquiry
+        is linked to the account). Rate-limited. Emails the listing's
+        owner (best-effort; a delivery failure doesn't fail the request).
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, message]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                phone: { type: string }
+                message: { type: string }
+      responses:
+        "201":
+          description: Sent.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { message: { type: string } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /properties/{id}/inspections:
+    post:
+      tags: [Properties]
+      summary: Request an inspection slot
+      description: Public (login optional). Rate-limited. Only bookable
+        for `active` listings. Emails the listing's owner (best-effort).
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, phone, inspection_date, inspection_time]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                phone: { type: string }
+                inspection_date: { type: string, format: date }
+                inspection_time: { type: string, example: "14:30" }
+                notes: { type: string }
+      responses:
+        "201":
+          description: Booked.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                      - $ref: "#/components/schemas/InspectionBooking"
+                      - type: object
+                        properties:
+                          property:
+                            type: object
+                            description: Public-safe subset — no owner
+                              contact info leaks to the person booking.
+                  message: { type: string }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /posts:
+    get:
+      tags: [Posts]
+      summary: List published blog posts
+      description: Only ever returns `published = true` posts — a draft's
+        slug 404s if hit directly (see `/posts/{slug}`).
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 50, default: 12 }
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Post" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+
+  /posts/{slug}:
+    get:
+      tags: [Posts]
+      summary: Get one published post
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Post" } }
+        "404":
+          description: Doesn't exist, or exists but isn't published.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /admin/stats:
+    get:
+      tags: [Admin]
+      summary: Dashboard summary numbers
+      responses:
+        "200": { description: OK. }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /admin/properties:
+    get:
+      tags: [Admin]
+      summary: List all listings (any status)
+      description: Unlike public search, includes pending/rejected/sold —
+        this is the review queue. Max page size 100.
+      parameters:
+        - name: verification_status
+          in: query
+          schema: { type: string, enum: [pending, verified, rejected] }
+        - $ref: "#/components/parameters/PageParam"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 100 }
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Property" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /admin/properties/{id}/verify:
+    patch:
+      tags: [Admin]
+      summary: Verify, reject, or reset a listing's review status
+      description: Emails the owner (best-effort) unless resetting to
+        `pending`, which is a neutral internal state change with nothing
+        actionable for them. Logged to the audit trail either way.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [verification_status]
+              properties:
+                verification_status: { type: string, enum: [verified, rejected, pending] }
+                verification_notes:
+                  type: string
+                  description: Shown to the owner in their rejection email
+                    when status is `rejected`; internal otherwise.
+      responses:
+        "200":
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Property" } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /admin/users:
+    get:
+      tags: [Admin]
+      summary: List all users
+      description: Never includes `password_hash`. Max page size 100.
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 100 }
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/User" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /admin/users/{id}/role:
+    patch:
+      tags: [Admin]
+      summary: Promote or demote a user
+      description: An admin cannot change their own role this way (400) —
+        prevents an admin locking themselves, and everyone else, out of
+        the console with no way back short of a direct database edit.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties: { role: { type: string, enum: [user, admin] } }
+      responses:
+        "200":
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { message: { type: string } }
+        "400":
+          description: Validation failed, or attempting to change your
+            own role.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /admin/users/{id}:
+    delete:
+      tags: [Admin]
+      summary: Delete a user
+      description: An admin cannot delete their own account this way
+        (400). Blocked (409) if the user still owns any listings —
+        delete or reassign those first.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204": { description: Deleted. }
+        "400":
+          description: Attempting to delete your own account.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: User still owns listings.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /admin/inquiries:
+    get:
+      tags: [Admin]
+      summary: List inquiries
+      parameters:
+        - name: property_id
+          in: query
+          schema: { type: integer }
+        - $ref: "#/components/parameters/PageParam"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 100 }
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Inquiry" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /admin/inspections:
+    get:
+      tags: [Admin]
+      summary: List inspection requests
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 100 }
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/InspectionBooking" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /admin/inspections/{id}:
+    patch:
+      tags: [Admin]
+      summary: Confirm or cancel an inspection request
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties: { status: { type: string, enum: [pending, confirmed, cancelled] } }
+      responses:
+        "200":
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/InspectionBooking" } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: That slot is already booked for this property.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /admin/audit-log:
+    get:
+      tags: [Admin]
+      summary: View the admin action audit trail
+      description: Every verify/reject decision, role change, deletion,
+        and post edit — who did it, when, and what changed.
+      parameters:
+        - name: target_type
+          in: query
+          schema: { type: string, enum: [property, user, inspection_booking, post] }
+        - name: target_id
+          in: query
+          schema: { type: string }
+        - $ref: "#/components/parameters/PageParam"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AdminActionLogEntry" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /admin/posts:
+    get:
+      tags: [Admin]
+      summary: List all posts (published and draft)
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 100 }
+      responses:
+        "200":
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Post" } }
+                  pagination: { $ref: "#/components/schemas/Pagination" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      tags: [Admin]
+      summary: Create a post
+      description: >
+        Slug is auto-generated from the title (and
+        de-duplicated — `same-title`, `same-title-2`, ...). Starts as a
+        draft unless `published: true` is sent.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, content]
+              properties:
+                title: { type: string }
+                content: { type: string, description: Markdown. }
+                excerpt: { type: string }
+                cover_image: { type: string }
+                published: { type: boolean, default: false }
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Post" } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /admin/posts/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer }
+    put:
+      tags: [Admin]
+      summary: Update a post
+      description: Toggling `published` from false → true sets
+        `published_at` to now; toggling back to false clears it.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                content: { type: string }
+                excerpt: { type: string }
+                cover_image: { type: string }
+                published: { type: boolean }
+      responses:
+        "200":
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { data: { $ref: "#/components/schemas/Post" } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Admin]
+      summary: Delete a post
+      responses:
+        "204": { description: Deleted. }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
