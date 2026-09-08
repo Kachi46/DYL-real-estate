@@ -945,10 +945,13 @@ button { font-family: inherit; cursor: pointer; }
 .agent-profile-panel p { color: var(--forest-600); }
 .agent-avatar-large { width: 4rem; height: 4rem; font-size: 1rem; }
 .navbar > .support-badge { position: static; display: flex; width: fit-content; margin: 0.1rem auto 0.45rem; }
-.support-badge { z-index: 50; align-items: center; gap: 0.45rem; background: #168c55; color: #fff; border-radius: 999px; padding: 0.7rem 0.95rem; font-size: 0.78rem; font-weight: 600; box-shadow: var(--shadow-md); }
+.support-badge { position: fixed; right: 0; top: 50%; z-index: 50; display: flex; align-items: center; gap: 0.45rem; transform: translateY(-50%); background: #168c55; color: #fff; border-radius: 999px 0 0 999px; padding: 0.7rem 0.95rem; font-size: 0.78rem; font-weight: 600; box-shadow: var(--shadow-md); }
 .navbar > .support-badge { padding: 0.35rem 0.65rem; font-size: 0.68rem; box-shadow: var(--shadow-sm); }
 .support-badge:hover { background: #116d42; }
 .support-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #8dffbd; box-shadow: 0 0 0 3px rgba(141,255,189,0.18); }
+@media (max-width: 767px) {
+  .support-badge { top: auto; bottom: 4.8rem; transform: none; padding: 0.6rem 0.8rem; }
+}
 .verified-note { margin-top: 1.5rem; background: var(--forest-50); border-radius: var(--radius-md); padding: 1rem 1.15rem; font-size: 0.85rem; color: var(--forest-700); border-left: 2px solid var(--gold-400); }
 
 .sidebar-card { border: 1px solid var(--line); border-radius: var(--radius-lg); background: #fff; padding: 1.5rem; box-shadow: var(--shadow-sm); }
