@@ -98,13 +98,18 @@ function render(p) {
           <p>${Util.escapeHtml(p.description)}</p>
         </div>
 
-        ${p.youtube_watch_url ? `
+        ${p.video_id ? `
           <div class="location-block">
             <h2>Video tour</h2>
-            <a class="video-tour-link" href="${p.youtube_watch_url}" target="_blank" rel="noopener noreferrer">
-              <img src="${p.youtube_thumbnail_url}" alt="Video tour of ${Util.escapeHtml(p.title)}" loading="lazy" />
-              <span class="video-tour-link-badge">▶ Watch on YouTube</span>
-            </a>
+            <div class="video-tour-frame">
+              <iframe
+                src="https://www.youtube.com/embed/${encodeURIComponent(p.video_id)}"
+                title="Video tour of ${Util.escapeHtml(p.title)}"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              ></iframe>
+            </div>
           </div>` : ""}
 
         <div class="location-block">

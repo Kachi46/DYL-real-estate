@@ -795,53 +795,16 @@ button { font-family: inherit; cursor: pointer; }
 
 .video-thumb-wrapper {
   position: relative;
-  aspect-ratio: 4/3;
+  aspect-ratio: 16/9;
   background: #000;
   overflow: hidden;
-  cursor: pointer;
 }
 
-.video-thumb-wrapper img {
+.video-thumb-wrapper iframe {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  opacity: 0.85;
-  transition: transform 0.5s ease, opacity 0.3s ease;
-}
-
-.video-home-card:hover .video-thumb-wrapper img {
-  transform: scale(1.05);
-  opacity: 0.95;
-}
-
-.play-badge-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 3.5rem;
-  height: 2.35rem;
-  background: #ff0000;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.video-thumb-wrapper:hover .play-badge-icon {
-  transform: translate(-50%, -50%) scale(1.12);
-  background: #cc0000;
-}
-
-.play-triangle {
-  width: 0;
-  height: 0;
-  border-top: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  border-left: 12px solid #ffffff;
-  margin-left: 2px;
+  border: 0;
+  display: block;
 }
 
 .video-youtube-badge {
@@ -931,10 +894,8 @@ button { font-family: inherit; cursor: pointer; }
 .desc p { line-height: 1.75; color: var(--forest-700); white-space: pre-line; }
 .location-block { margin-top: 1.6rem; }
 .location-block h2 { font-family: 'Fraunces', serif; font-size: 1.1rem; color: var(--forest-900); margin-bottom: 0.5rem; }
-.video-tour-link { position: relative; display: block; aspect-ratio: 16/9; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--line); text-decoration: none; }
-.video-tour-link img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; transition: opacity 0.2s ease; }
-.video-tour-link:hover img { opacity: 0.95; }
-.video-tour-link-badge { position: absolute; bottom: 0.75rem; left: 0.75rem; right: 0.75rem; background: rgba(0, 0, 0, 0.72); color: #fff; font-size: 0.8rem; font-weight: 600; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm, 6px); text-align: center; }
+.video-tour-frame { width: 100%; aspect-ratio: 16/9; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--line); background: #000; }
+.video-tour-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
 .location-map-frame { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: var(--radius-lg); overflow: hidden; background: var(--forest-50); border: 1px solid var(--line); }
 .location-map-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
 .location-map-fallback { display: flex; align-items: center; justify-content: center; height: 100%; padding: 1rem; text-align: center; color: var(--forest-500); font-size: 0.85rem; }

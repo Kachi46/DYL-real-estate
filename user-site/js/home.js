@@ -35,8 +35,7 @@ document.getElementById("home-search-form")?.addEventListener("submit", (e) => {
 });
 
 // "Homes with Videos" — pulls real listings that have a YouTube video
-// attached and links straight out to YouTube for each one, so the view
-// happens on YouTube itself rather than in an embedded player on this site.
+// attached and renders each one in an embedded player on this site.
 async function loadVideoHomes() {
   const grid = document.getElementById("video-homes-grid");
   if (!grid) return;
@@ -61,20 +60,22 @@ async function loadVideoHomes() {
 
 function videoHomeCardHtml(p) {
   return `
-    <a class="video-home-card" href="${p.youtube_watch_url}" target="_blank" rel="noopener noreferrer">
+    <article class="video-home-card">
       <div class="video-thumb-wrapper">
-        <img src="${p.youtube_thumbnail_url}" alt="${Util.escapeHtml(p.title)}" loading="lazy" />
-        <div class="play-badge-icon">
-          <div class="play-triangle"></div>
-        </div>
-        <span class="video-youtube-badge">▶ Watch on YouTube</span>
+        <iframe
+          src="https://www.youtube.com/embed/${encodeURIComponent(p.video_id)}"
+          title="Video tour of ${Util.escapeHtml(p.title)}"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
       </div>
       <div class="video-card-content">
         <p class="video-card-tag">${Util.escapeHtml(p.title.toUpperCase())}</p>
         <p class="video-card-price">${Util.formatPrice(p.price, p.currency, p.listing_type)}</p>
         <p class="video-card-loc">${Util.escapeHtml(p.city)}, ${Util.escapeHtml(p.state)}</p>
       </div>
-    </a>
+    </article>
   `;
 }
 
