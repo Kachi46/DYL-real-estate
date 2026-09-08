@@ -33,23 +33,59 @@ function renderSettings() {
   panel.innerHTML = `
     <section class="dashboard-card settings-card">
       <h2>Account settings</h2>
-      <p class="settings-description">Choose how DYL Real-Estate Services looks on your devices.</p>
+      <p class="settings-description">Manage your account, security, and how DYL Real-Estate Services looks.</p>
       <div class="settings-row">
         <div>
-          <strong>Theme</strong>
-          <span>Use your device preference or choose an appearance.</span>
+          <strong>Appearance</strong>
+          <span>Use your device theme, or always use light or dark mode.</span>
         </div>
         <div class="theme-segment-control" aria-label="Theme preference">
-          <button type="button" class="theme-segment-btn" data-theme-val="system" title="Use system theme">System</button>
+          <button type="button" class="theme-segment-btn" data-theme-val="system" title="Use your device theme">Device</button>
           <button type="button" class="theme-segment-btn" data-theme-val="light" title="Use light theme">Light</button>
           <button type="button" class="theme-segment-btn" data-theme-val="dark" title="Use dark theme">Dark</button>
         </div>
+      </div>
+      <div class="settings-section" id="security">
+        <h3>Security</h3>
+        <p class="settings-description">Change your password while you are signed in.</p>
+        <div id="password-message"></div>
+        <form class="settings-password-form" id="settings-form">
+          <label class="field">Current password<input required type="password" id="settings-current-password" autocomplete="current-password" /></label>
+          <label class="field">New password<input required type="password" minlength="8" id="settings-new-password" autocomplete="new-password" /></label>
+          <label class="field">Confirm new password<input required type="password" minlength="8" id="settings-confirm-password" autocomplete="new-password" /></label>
+          <button type="submit" class="btn btn-primary">Update password</button>
+        </form>
+      </div>
+      <div class="settings-section" id="verification">
+        <h3>Email verification</h3>
+        <p class="settings-description">A verified email helps us keep your account secure.</p>
+        <a class="btn btn-outline" href="#verification">Check verification status</a>
       </div>
     </section>
   `;
   ThemeManager.updateControls(ThemeManager.getThemeSetting());
   panel.querySelectorAll(".theme-segment-btn").forEach((button) => {
     button.addEventListener("click", () => ThemeManager.apply(button.dataset.themeVal));
+  });
+  document.getElementById("settings-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const message = document.getElementById("password-message");
+    const newPassword = document.getElementById("settings-new-password").value;
+    if (newPassword !== document.getElementById("settings-confirm-password").value) {
+      message.innerHTML = `<p class="alert alert-error">The new passwords do not match.</p>`;
+      return;
+    }
+    try {
+      const result = await Api.post("/auth/change-password", {
+        current_password: document.getElementById("settings-current-password").value,
+        new_password: newPassword,
+      });
+      Api.setToken(result.token);
+      message.innerHTML = `<p class="alert alert-info">Your password has been updated.</p>`;
+      document.getElementById("settings-form").reset();
+    } catch (err) {
+      message.innerHTML = `<p class="alert alert-error">${Util.escapeHtml(err.message)}</p>`;
+    }
   });
 }
 

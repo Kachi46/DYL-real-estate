@@ -86,6 +86,7 @@ button { font-family: inherit; cursor: pointer; }
 
 .settings-card { max-width: 48rem; }
 .settings-card h2 { margin: 0; color: var(--forest-900); font-family: 'Fraunces', serif; }
+.settings-card h3 { margin: 0; color: var(--forest-900); font-size: 1rem; }
 .settings-description { margin: .35rem 0 1.25rem; color: var(--forest-600); }
 .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; background: var(--forest-50); border: 1px solid var(--line); border-radius: var(--radius-md); }
 .settings-row strong, .settings-row span { display: block; }
@@ -95,11 +96,35 @@ button { font-family: inherit; cursor: pointer; }
 .theme-segment-btn { border: 0; border-radius: calc(var(--radius-md) - 2px); padding: .45rem .7rem; background: transparent; color: var(--forest-700); cursor: pointer; font: inherit; font-size: .8rem; }
 .theme-segment-btn.active { background: var(--forest-800); color: var(--sand); }
 .theme-segment-btn:hover { color: var(--gold-600); }
+.settings-section { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.settings-password-form { display: grid; gap: .8rem; max-width: 32rem; }
+.user-settings-trigger { position: fixed; left: 1rem; bottom: 1rem; z-index: 80; display: inline-flex; align-items: center; gap: .45rem; border: 1px solid var(--line); border-radius: 999px; padding: .65rem .9rem; background: var(--forest-900); color: var(--sand); box-shadow: var(--shadow-md); cursor: pointer; font: inherit; font-size: .8rem; font-weight: 600; }
+.user-settings-trigger:hover { background: var(--forest-800); }
+.settings-trigger-icon { font-size: 1rem; line-height: 1; }
+.user-settings-panel { position: fixed; left: 1rem; bottom: 4.5rem; z-index: 79; width: min(22rem, calc(100vw - 2rem)); padding: 1rem; background: var(--sand); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); }
+.user-settings-header { display: flex; justify-content: space-between; gap: 1rem; padding-bottom: .85rem; border-bottom: 1px solid var(--line); }
+.user-settings-header h2 { margin: .15rem 0; color: var(--forest-900); font-family: 'Fraunces', serif; font-size: 1.1rem; }
+.user-settings-header p { margin: 0; color: var(--forest-500); font-size: .78rem; overflow-wrap: anywhere; }
+.settings-eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: .65rem !important; font-weight: 700; color: var(--gold-600) !important; }
+.settings-close { border: 0; background: transparent; color: var(--forest-600); font-size: 1.4rem; cursor: pointer; align-self: flex-start; }
+.user-settings-links { display: grid; gap: .2rem; padding: .75rem 0; }
+.user-settings-links a { display: flex; justify-content: space-between; padding: .55rem .2rem; color: var(--forest-700); font-size: .85rem; }
+.user-settings-links a:hover { color: var(--gold-600); }
+.user-settings-links span { color: var(--forest-400); font-size: 1.1rem; }
+.user-settings-theme { display: grid; gap: .65rem; padding: .85rem 0; border-top: 1px solid var(--line); }
+.user-settings-theme strong, .user-settings-theme span { display: block; }
+.user-settings-theme strong { color: var(--forest-800); font-size: .85rem; }
+.user-settings-theme span { margin-top: .15rem; color: var(--forest-500); font-size: .75rem; }
+.settings-status { margin: .75rem 0 0; padding-top: .75rem; border-top: 1px solid var(--line); font-size: .75rem; }
+.settings-status.is-success { color: #168c55; }
+.settings-status.is-warning { color: var(--gold-600); }
 
 @media (max-width: 600px) {
   .settings-row { align-items: stretch; flex-direction: column; }
   .theme-segment-control { justify-content: stretch; }
   .theme-segment-btn { flex: 1; }
+  .user-settings-trigger { left: .75rem; bottom: 4.8rem; }
+  .user-settings-panel { left: .75rem; bottom: 8.3rem; }
 }
 
 /* Dark Mode Theme */

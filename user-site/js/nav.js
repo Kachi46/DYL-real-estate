@@ -100,9 +100,9 @@ function renderNavbar() {
       document.getElementById("nav-dashboard-link").style.display = "";
       actions.innerHTML = `
         <span class="user-greeting">Hi, ${Util.escapeHtml(res.user.name.split(" ")[0])}</span>
-        <a href="dashboard.html#settings" class="btn btn-outline" style="padding:0.45rem 0.85rem;">Settings</a>
         <button class="btn btn-outline" id="logout-btn" style="padding:0.45rem 0.85rem;">Log out</button>
       `;
+      renderUserSettings(res.user);
       document.getElementById("logout-btn").addEventListener("click", () => {
         Api.clearToken();
         window.location.href = "index.html";
@@ -115,6 +115,61 @@ function renderNavbar() {
         <a href="dashboard.html" class="btn btn-gold">Post Property</a>
       `;
     });
+}
+
+function renderUserSettings(user) {
+  document.body.insertAdjacentHTML("beforeend", `
+    <button type="button" class="user-settings-trigger" id="user-settings-trigger" aria-expanded="false" aria-controls="user-settings-panel">
+      <span class="settings-trigger-icon" aria-hidden="true">⚙</span>
+      <span>Settings</span>
+    </button>
+    <aside class="user-settings-panel" id="user-settings-panel" aria-label="Account settings" hidden>
+      <div class="user-settings-header">
+        <div>
+          <p class="settings-eyebrow">Your account</p>
+          <h2>${Util.escapeHtml(user.name)}</h2>
+          <p>${Util.escapeHtml(user.email)}</p>
+        </div>
+        <button type="button" class="settings-close" id="user-settings-close" aria-label="Close settings">&times;</button>
+      </div>
+      <div class="user-settings-links">
+        <a href="dashboard.html#settings">Account settings <span>›</span></a>
+        <a href="dashboard.html">My dashboard <span>›</span></a>
+        <a href="dashboard.html#settings">Change password <span>›</span></a>
+      </div>
+      <div class="user-settings-theme">
+        <div>
+          <strong>Appearance</strong>
+          <span>Choose how the site looks.</span>
+        </div>
+        <div class="theme-segment-control" aria-label="Theme preference">
+          <button type="button" class="theme-segment-btn" data-theme-val="system" title="Use your device theme">Device</button>
+          <button type="button" class="theme-segment-btn" data-theme-val="light" title="Always use light theme">Light</button>
+          <button type="button" class="theme-segment-btn" data-theme-val="dark" title="Always use dark theme">Dark</button>
+        </div>
+      </div>
+      <p class="settings-status ${user.email_verified ? "is-success" : "is-warning"}">
+        ${user.email_verified ? "Email verified" : "Email not verified. Verify it from your dashboard."}
+      </p>
+    </aside>
+  `);
+
+  const trigger = document.getElementById("user-settings-trigger");
+  const panel = document.getElementById("user-settings-panel");
+  const close = () => {
+    panel.hidden = true;
+    trigger.setAttribute("aria-expanded", "false");
+  };
+  trigger.addEventListener("click", () => {
+    panel.hidden = !panel.hidden;
+    trigger.setAttribute("aria-expanded", String(!panel.hidden));
+  });
+  document.getElementById("user-settings-close").addEventListener("click", close);
+  panel.querySelectorAll("a").forEach((link) => link.addEventListener("click", close));
+  panel.querySelectorAll(".theme-segment-btn").forEach((button) => {
+    button.addEventListener("click", () => ThemeManager.apply(button.dataset.themeVal));
+  });
+  ThemeManager.updateControls(ThemeManager.getThemeSetting());
 }
 
 function renderFooter() {
