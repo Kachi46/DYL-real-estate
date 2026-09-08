@@ -63,6 +63,9 @@ function renderNavbar() {
 
       <div class="nav-actions" id="nav-actions"></div>
     </div>
+  `;
+
+  root.insertAdjacentHTML("afterend", `
     <nav class="mobile-bottom-nav" aria-label="More pages">
       <a href="trust.html">Trust and legal</a>
       <a href="about.html">About us</a>
@@ -82,8 +85,7 @@ function renderNavbar() {
       <a href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
     </nav>
     <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer"><span class="support-dot"></span> Support</a>
-  `;
-
+  `);
   const actions = document.getElementById("nav-actions");
 
   if (!token) {

@@ -206,11 +206,11 @@ button { font-family: inherit; cursor: pointer; }
 
 @media (max-width: 767px) {
   body { padding-bottom: 4.25rem; }
-  .navbar-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 0.45rem; padding-left: 1rem; padding-right: 1rem; }
+  .navbar-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.45rem; padding-left: 1rem; padding-right: 1rem; }
   .brand { min-width: 0; }
   .brand span { font-size: 1rem; line-height: 1.05; }
-  .nav-actions { gap: 0.4rem; }
-  .user-greeting { font-size: 0.75rem; }
+  .nav-actions { min-width: 0; gap: 0.4rem; }
+  .user-greeting { max-width: 5.5rem; overflow: hidden; text-overflow: ellipsis; font-size: 0.75rem; }
   .nav-actions .btn { padding-left: 0.65rem; padding-right: 0.65rem; }
   .nav-links { display: none; }
   .mobile-bottom-nav {
