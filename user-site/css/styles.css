@@ -82,14 +82,25 @@ button { font-family: inherit; cursor: pointer; }
 .nav-links a:hover { color: var(--gold-500); }
 .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
 .user-greeting { font-size: 0.85rem; color: var(--forest-700); white-space: nowrap; }
-.theme-toggle-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 2.25rem; height: 2.25rem; border: 1px solid var(--line);
-  border-radius: var(--radius-md); background: #fff; color: var(--forest-700);
-  padding: 0.4rem; cursor: pointer; transition: all .2s ease;
-}
-.theme-toggle-btn:hover { border-color: var(--gold-400); background: var(--forest-50); color: var(--gold-500); transform: scale(1.05); }
 .mobile-bottom-nav { display: none; }
+
+.settings-card { max-width: 48rem; }
+.settings-card h2 { margin: 0; color: var(--forest-900); font-family: 'Fraunces', serif; }
+.settings-description { margin: .35rem 0 1.25rem; color: var(--forest-600); }
+.settings-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; background: var(--forest-50); border: 1px solid var(--line); border-radius: var(--radius-md); }
+.settings-row strong, .settings-row span { display: block; }
+.settings-row strong { color: var(--forest-800); }
+.settings-row span { margin-top: .2rem; font-size: .85rem; color: var(--forest-600); }
+.theme-segment-control { display: inline-flex; gap: 2px; padding: 3px; background: rgba(0,0,0,.08); border: 1px solid var(--line); border-radius: var(--radius-md); }
+.theme-segment-btn { border: 0; border-radius: calc(var(--radius-md) - 2px); padding: .45rem .7rem; background: transparent; color: var(--forest-700); cursor: pointer; font: inherit; font-size: .8rem; }
+.theme-segment-btn.active { background: var(--forest-800); color: var(--sand); }
+.theme-segment-btn:hover { color: var(--gold-600); }
+
+@media (max-width: 600px) {
+  .settings-row { align-items: stretch; flex-direction: column; }
+  .theme-segment-control { justify-content: stretch; }
+  .theme-segment-btn { flex: 1; }
+}
 
 /* Dark Mode Theme */
 [data-theme="dark"] {
@@ -131,7 +142,6 @@ button { font-family: inherit; cursor: pointer; }
 [data-theme="dark"] .faq-list details,
 [data-theme="dark"] .empty-state,
 [data-theme="dark"] .doc-card,
-[data-theme="dark"] .theme-toggle-btn,
 [data-theme="dark"] .mobile-bottom-nav {
   background: #12221b;
   border-color: var(--line);

@@ -9,7 +9,7 @@ let savedPagination = null;
 let listingsPage = 1;
 let savedPage = 1;
 
-const tabs = ["listings", "saved", "add"];
+const tabs = ["listings", "saved", "add", "settings"];
 
 function showTab(tab) {
   tabs.forEach((t) => {
@@ -19,11 +19,41 @@ function showTab(tab) {
   if (tab === "add" && !document.getElementById("listing-form")) {
     renderAddForm();
   }
+  if (tab === "settings" && !document.getElementById("settings-form")) {
+    renderSettings();
+  }
 }
 
 tabs.forEach((t) => {
   document.getElementById(`tab-${t}`).addEventListener("click", () => showTab(t));
 });
+
+function renderSettings() {
+  const panel = document.getElementById("panel-settings");
+  panel.innerHTML = `
+    <section class="dashboard-card settings-card">
+      <h2>Account settings</h2>
+      <p class="settings-description">Choose how DYL Real-Estate Services looks on your devices.</p>
+      <div class="settings-row">
+        <div>
+          <strong>Theme</strong>
+          <span>Use your device preference or choose an appearance.</span>
+        </div>
+        <div class="theme-segment-control" aria-label="Theme preference">
+          <button type="button" class="theme-segment-btn" data-theme-val="system" title="Use system theme">System</button>
+          <button type="button" class="theme-segment-btn" data-theme-val="light" title="Use light theme">Light</button>
+          <button type="button" class="theme-segment-btn" data-theme-val="dark" title="Use dark theme">Dark</button>
+        </div>
+      </div>
+    </section>
+  `;
+  ThemeManager.updateControls(ThemeManager.getThemeSetting());
+  panel.querySelectorAll(".theme-segment-btn").forEach((button) => {
+    button.addEventListener("click", () => ThemeManager.apply(button.dataset.themeVal));
+  });
+}
+
+if (window.location.hash === "#settings") showTab("settings");
 
 function renderListings() {
   document.getElementById("tab-listings").textContent = `My Listings (${listingsPagination?.total ?? myListings.length})`;
