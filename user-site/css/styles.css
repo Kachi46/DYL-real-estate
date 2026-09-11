@@ -200,6 +200,22 @@ button { font-family: inherit; cursor: pointer; }
   background: #152820;
 }
 
+[data-theme="dark"] .user-type-card {
+  background: #172c23;
+  border-color: #7daaa9;
+  color: #eaf3ee;
+}
+
+[data-theme="dark"] .user-type-card:hover {
+  background: #193126;
+}
+
+[data-theme="dark"] .user-type-card.active {
+  background: #eaf6f1;
+  border-color: #eaf6f1;
+  color: #071510;
+}
+
 @media (min-width: 768px) {
   .nav-links { display: flex; }
 }
