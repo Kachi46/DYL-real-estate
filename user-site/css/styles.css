@@ -211,8 +211,8 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 [data-theme="dark"] .user-type-card.active {
-  background: #eaf6f1;
-  border-color: #eaf6f1;
+  background: #4caf7d;
+  border-color: #4caf7d;
   color: #071510;
 }
 
@@ -526,10 +526,10 @@ button { font-family: inherit; cursor: pointer; }
 
 .user-type-card {
   padding: 0.72rem 1rem;
-  border: 2px solid var(--forest-800);
+  border: 2px solid var(--forest-300);
   border-radius: 0.25rem;
   background: #fff;
-  color: var(--forest-800);
+  color: var(--forest-900);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -539,12 +539,19 @@ button { font-family: inherit; cursor: pointer; }
 
 .user-type-card:hover {
   background: var(--forest-50);
+  border-color: var(--forest-500);
 }
 
 .user-type-card.active {
-  background: var(--forest-800);
+  background: #2f7d5a;
+  border-color: #2f7d5a;
   color: #fff;
   box-shadow: var(--shadow-md);
+}
+
+.user-type-card:focus-visible {
+  outline: 3px solid var(--gold-300);
+  outline-offset: 2px;
 }
 
 .alert { border-radius: var(--radius-md); padding: 0.65rem 0.95rem; font-size: 0.85rem; margin-bottom: 1rem; }
