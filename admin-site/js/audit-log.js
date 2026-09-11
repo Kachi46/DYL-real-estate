@@ -1,6 +1,7 @@
 const ACTION_LABELS = {
   "property.verification_status_changed": "Changed listing verification status",
   "user.role_changed": "Changed user role",
+  "user.account_type_changed": "Changed user account type",
   "user.deleted": "Deleted user",
   "inspection.status_changed": "Changed inspection status",
   "post.created": "Created post",

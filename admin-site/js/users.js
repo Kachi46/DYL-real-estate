@@ -21,7 +21,12 @@ function renderUsers(users, pagination) {
       <td class="row-title">${Util.escapeHtml(u.name)}</td>
       <td>${Util.escapeHtml(u.email)}</td>
       <td>${u.phone ? Util.escapeHtml(u.phone) : "—"}</td>
-      <td>${u.user_type ? Util.escapeHtml(u.user_type) : "—"}</td>
+      <td>
+        <select class="user-type-select" data-action="change-type" data-id="${u.id}" data-name="${Util.escapeHtml(u.name)}" aria-label="Account type for ${Util.escapeHtml(u.name)}">
+          <option value="user"${u.user_type === "user" ? " selected" : ""}>User</option>
+          <option value="landlord"${u.user_type === "landlord" ? " selected" : ""}>Landlord</option>
+        </select>
+      </td>
       <td>${Util.statusPill(u.role)}</td>
       <td>${new Date(u.created_at).toLocaleDateString()}</td>
       <td class="actions">
@@ -49,6 +54,10 @@ function renderUsers(users, pagination) {
   table.querySelectorAll("button[data-action]").forEach((btn) => {
     btn.addEventListener("click", () => handleAction(btn));
   });
+  table.querySelectorAll("select[data-action='change-type']").forEach((select) => {
+    select.dataset.previousType = select.value;
+    select.addEventListener("change", () => handleAction(select));
+  });
 }
 
 async function handleAction(btn) {
@@ -68,6 +77,22 @@ async function handleAction(btn) {
       loadUsers();
     } catch (err) {
       window.alert(err.message || "Couldn't update that user's role.");
+    }
+  } else if (action === "change-type") {
+    const previousType = btn.dataset.previousType;
+    const nextType = btn.value;
+    if (nextType === previousType) return;
+    if (!window.confirm(`Change ${name}'s account type to "${nextType}"?`)) {
+      btn.value = previousType;
+      return;
+    }
+    try {
+      await Api.patch(`/admin/users/${id}/type`, { user_type: nextType });
+      btn.dataset.previousType = nextType;
+      loadUsers();
+    } catch (err) {
+      btn.value = previousType;
+      window.alert(err.message || "Couldn't update that account type.");
     }
   } else if (action === "delete") {
     if (window.currentAdmin && id === window.currentAdmin.id) {

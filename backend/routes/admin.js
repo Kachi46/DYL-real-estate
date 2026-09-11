@@ -331,6 +331,59 @@ router.patch(
   }
 );
 
+// PATCH /api/admin/users/:id/type
+// Change a user's account type
+router.patch(
+  "/users/:id/type",
+  [body("user_type").isIn(["user", "landlord"])],
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ error: errors.array()[0].msg });
+      }
+
+      if (!/^\d+$/.test(req.params.id)) {
+        return res.status(400).json({ error: "Invalid user ID." });
+      }
+
+      const existingRows = await db.sql`
+        SELECT id
+        FROM users
+        WHERE id = ${req.params.id}
+        LIMIT 1
+      `;
+
+      if (existingRows.length === 0) {
+        return res.status(404).json({ error: "User not found." });
+      }
+
+      await db.sql`
+        UPDATE users
+        SET user_type = ${req.body.user_type}
+        WHERE id = ${req.params.id}
+      `;
+
+      try {
+        await logAdminAction({
+          adminId: req.user.id,
+          action: "user.account_type_changed",
+          targetType: "user",
+          targetId: req.params.id,
+          details: { new_user_type: req.body.user_type },
+        });
+      } catch (logErr) {
+        console.error("Failed to write audit log entry:", logErr);
+      }
+
+      return res.json({ message: "User account type updated." });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 // DELETE /api/admin/users/:id
 router.delete("/users/:id", async (req, res, next) => {
   try {

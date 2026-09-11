@@ -118,6 +118,33 @@ describe("PATCH /api/admin/users/:id/role", () => {
   });
 });
 
+describe("PATCH /api/admin/users/:id/type", () => {
+  it("lets an admin change a user to landlord", async () => {
+    const token = await loginAs(ADMIN.email, "admin-pass-4");
+    const res = await request(app)
+      .patch(`/api/admin/users/${REGULAR_USER.id}/type`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ user_type: "landlord" });
+
+    expect(res.status).toBe(200);
+
+    const usersRes = await request(app)
+      .get("/api/admin/users")
+      .set("Authorization", `Bearer ${token}`);
+    expect(usersRes.body.data.find((user) => user.id === REGULAR_USER.id).user_type).toBe("landlord");
+  });
+
+  it("rejects account types removed from the site", async () => {
+    const token = await loginAs(ADMIN.email, "admin-pass-4");
+    const res = await request(app)
+      .patch(`/api/admin/users/${REGULAR_USER.id}/type`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ user_type: "agent" });
+
+    expect(res.status).toBe(400);
+  });
+});
+
 describe("DELETE /api/admin/users/:id", () => {
   it("blocks an admin from deleting their own account", async () => {
     const token = await loginAs(ADMIN.email, "admin-pass-4");
