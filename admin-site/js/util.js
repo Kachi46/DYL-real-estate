@@ -16,7 +16,11 @@ const Util = {
     }).format(price);
   },
   statusPill(status) {
-    return `<span class="status-pill status-${Util.escapeHtml(status)}">${Util.escapeHtml(status)}</span>`;
+    // Convert snake_case to Title Case for display (e.g. "super_admin" → "Super Admin")
+    const label = status
+      ? status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+      : "";
+    return `<span class="status-pill status-${Util.escapeHtml(status)}">${Util.escapeHtml(label)}</span>`;
   },
   renderMarkdown(markdown) {
     if (!markdown) return "";

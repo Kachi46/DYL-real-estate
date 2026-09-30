@@ -14,7 +14,10 @@
 // not exist for them - that's why nothing loads.
 
 
-window.VERI_ESTATE_API_URL = "https://dly-real-estate-backend.vercel.app/api";
+const isLocalFrontend = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+window.VERI_ESTATE_API_URL = isLocalFrontend
+	? ""
+	: "https://dly-real-estate-backend.vercel.app/api";
 
 // Optional: only needed if you've set up "Sign in with Google" (see
 // backend/.env.example -> GOOGLE_CLIENT_ID). Leave blank to keep the

@@ -1,4 +1,6 @@
 const els = {
+  form: document.getElementById("listing-filters"),
+  clearFilters: document.getElementById("clear-filters"),
   q: document.getElementById("f-q"),
   state: document.getElementById("f-state"),
   type: document.getElementById("f-type"),
@@ -77,12 +79,38 @@ async function loadResults() {
   }
 }
 
-els.q?.addEventListener("change", (e) => updateUrl({ q: e.target.value }));
-els.state?.addEventListener("change", (e) => updateUrl({ state: e.target.value }));
-els.type?.addEventListener("change", (e) => updateUrl({ property_type: e.target.value }));
-els.listing?.addEventListener("change", (e) => updateUrl({ listing_type: e.target.value }));
-els.minPrice?.addEventListener("change", (e) => updateUrl({ min_price: e.target.value }));
-els.maxPrice?.addEventListener("change", (e) => updateUrl({ max_price: e.target.value }));
-els.verified?.addEventListener("change", (e) => updateUrl({ verified_only: e.target.checked ? "true" : "" }));
+function validatePriceRange() {
+  const minPrice = Number(els.minPrice?.value || 0);
+  const maxPrice = Number(els.maxPrice?.value || 0);
+  const invalidRange = minPrice > 0 && maxPrice > 0 && minPrice > maxPrice;
+  els.maxPrice?.setCustomValidity(
+    invalidRange ? "Maximum price must be at least the minimum price." : ""
+  );
+  return !invalidRange;
+}
+
+els.form?.addEventListener("input", validatePriceRange);
+els.form?.addEventListener("change", validatePriceRange);
+els.form?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!validatePriceRange()) {
+    els.maxPrice?.reportValidity();
+    return;
+  }
+
+  updateUrl({
+    q: els.q?.value.trim() || "",
+    state: els.state?.value || "",
+    property_type: els.type?.value || "",
+    listing_type: els.listing?.value || "",
+    min_price: els.minPrice?.value || "",
+    max_price: els.maxPrice?.value || "",
+    verified_only: els.verified?.checked ? "true" : "",
+  });
+});
+
+els.clearFilters?.addEventListener("click", () => {
+  window.location.href = "listings.html";
+});
 
 loadResults();

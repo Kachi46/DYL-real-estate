@@ -37,15 +37,30 @@ const ThemeManager = {
 
 ThemeManager.init();
 
-const NAV_ITEMS = [
-  { href: "index.html", label: "Dashboard", match: "dashboard" },
-  { href: "listings.html", label: "Listings", match: "listings" },
-  { href: "inspections.html", label: "Inspections", match: "inspections" },
-  { href: "posts.html", label: "Blog", match: "posts" },
-  { href: "users.html", label: "Users", match: "users" },
-  { href: "audit-log.html", label: "Audit Log", match: "audit-log" },
-  { href: "profile.html", label: "Edit Profile", match: "profile" },
+// Nav items visible to regular admins
+const ADMIN_NAV_ITEMS = [
+  { href: "index.html",        label: "Dashboard",   match: "dashboard" },
+  { href: "listings.html",     label: "Listings",    match: "listings" },
+  { href: "inspections.html",  label: "Inspections", match: "inspections" },
+  { href: "posts.html",        label: "Blog",        match: "posts" },
+  { href: "profile.html",      label: "Edit Profile",match: "profile" },
 ];
+
+// Extra nav items only visible to super admins
+const SUPER_ADMIN_NAV_ITEMS = [
+  { href: "users.html",        label: "Users",       match: "users" },
+  { href: "audit-log.html",    label: "Audit Log",   match: "audit-log" },
+];
+
+function getNavItems(role) {
+  if (role === "super_admin") return [...ADMIN_NAV_ITEMS, ...SUPER_ADMIN_NAV_ITEMS];
+  return ADMIN_NAV_ITEMS;
+}
+
+/** Returns true when the current session belongs to a super_admin */
+function isSuperAdmin() {
+  return window.currentAdmin && window.currentAdmin.role === "super_admin";
+}
 
 function getPublicSiteUrl(path) {
   const configuredUrl = window.VERI_ESTATE_PUBLIC_SITE_URL;
@@ -70,17 +85,21 @@ function renderSidebar(admin) {
     </button>
   `);
 
+  const navItems = getNavItems(admin.role);
+  const roleBadgeLabel = admin.role === "super_admin" ? "Super Admin" : "Admin";
+  const roleBadgeClass = admin.role === "super_admin" ? "role-badge role-badge--super" : "role-badge role-badge--admin";
+
   root.innerHTML = `
     <div class="sidebar-brand">
       <img src="./img/logo.png" alt="DYL Real-Estate Services logo" height="32" width="32" />
       <div>
         <p class="name">DYL Real-Estate Services</p>
-        <p class="tag">Admin</p>
+        <span class="${roleBadgeClass}">${roleBadgeLabel}</span>
       </div>
     </div>
 
     <nav class="sidebar-nav">
-      ${NAV_ITEMS.map((item) => `<a href="${item.href}" class="${item.match === current ? "active" : ""}">${Util.escapeHtml(item.label)}</a>`).join("")}
+      ${navItems.map((item) => `<a href="${item.href}" class="${item.match === current ? "active" : ""}">${Util.escapeHtml(item.label)}</a>`).join("")}
     </nav>
 
     <!-- Profile Setting Card (screenshot style) -->
@@ -183,7 +202,8 @@ async function initAdminShell() {
   }
   try {
     const res = await Api.get("/auth/me");
-    if (res.user.role !== "admin") {
+    const allowedRoles = ["admin", "super_admin"];
+    if (!allowedRoles.includes(res.user.role)) {
       Api.clearToken();
       window.location.href = "login.html";
       return;

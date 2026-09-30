@@ -45,77 +45,238 @@ function renderNavbar() {
   root.innerHTML = `
     <div class="navbar-inner">
       <a class="brand" href="index.html">
-        <img src="./img/logo.png" alt="DYL Real-Estate Services logo" height="28" width="28" />
-        <span>DYL Real-Estate Services</span>
+        <img src="./img/logo.png" alt="DYL Real-Estate Services logo" height="32" width="32" />
+        <span class="brand-text">DYL Real-Estate Services</span>
       </a>
 
       <nav class="nav-links">
-        <a href="listings.html?listing_type=sale">Buy</a>
-        <a href="listings.html?listing_type=rent">Rent</a>
-        <a href="listings.html?property_type=residential">New Project</a>
-        <span class="nav-divider">|</span>
-        <a href="listings.html?listing_type=rent&property_type=residential">Shortlet</a>
-        <a href="agents.html">Agents</a>
-        <a href="index.html#locations">Area Guide</a>
-        <a href="blog.html">Blogs</a>
-        <a href="dashboard.html" id="nav-dashboard-link" style="display:none;">My Dashboard</a>
+        <a href="listings.html?listing_type=sale" class="nav-link">Buy</a>
+        <a href="listings.html?listing_type=rent" class="nav-link">Rent</a>
+
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-btn" aria-haspopup="true" aria-expanded="false">
+            Properties
+            <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="listings.html?property_type=residential">Residential Homes</a>
+            <a href="listings.html?property_type=land">Land & Plots</a>
+            <a href="listings.html?property_type=commercial">Commercial Spaces</a>
+            <a href="listings.html?listing_type=rent&property_type=residential">Shortlet Apartments</a>
+            <div class="nav-dropdown-divider"></div>
+            <a href="listings.html?verified_only=true" class="highlight-link">
+              <span class="verified-dot"></span> Title-Verified Only
+            </a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-btn" aria-haspopup="true" aria-expanded="false">
+            Explore
+            <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="index.html#locations">Area Guide</a>
+            <a href="blog.html">Market Insights & Blog</a>
+            <a href="mortgage.html">Mortgage Calculator</a>
+            <a href="book-inspection.html">Book Inspection</a>
+            <a href="trust.html">Trust & Legal</a>
+            <a href="about.html">About DYL</a>
+          </div>
+        </div>
+
+        <a href="tel:+2348000000000" class="nav-link nav-call-link" title="Call DYL Property Desk">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          <span>Call</span>
+        </a>
+
+        <a href="dashboard.html" id="nav-dashboard-link" class="nav-link" style="display:none;">My Dashboard</a>
       </nav>
 
-      <div class="nav-actions" id="nav-actions"></div>
+      <div class="nav-actions-wrapper">
+        <a href="listings.html" class="nav-search-btn" title="Search properties" aria-label="Search properties">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </a>
+
+        <div class="nav-actions" id="nav-actions"></div>
+
+        <button type="button" class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle Navigation Menu" aria-expanded="false">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-nav-backdrop" id="mobile-nav-backdrop"></div>
+    <div class="mobile-nav-drawer" id="mobile-nav-drawer">
+      <div class="mobile-drawer-header">
+        <a class="brand" href="index.html">
+          <img src="./img/logo.png" alt="DYL Real-Estate Services logo" height="26" width="26" />
+          <span>DYL Services</span>
+        </a>
+        <button type="button" class="mobile-drawer-close" id="mobile-drawer-close" aria-label="Close menu">&times;</button>
+      </div>
+
+      <div class="mobile-drawer-body">
+        <a href="tel:+2348000000000" class="mobile-call-banner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          <span>Call DYL Property Desk</span>
+          <strong>+234 800 000 0000</strong>
+        </a>
+
+        <div class="mobile-nav-group">
+          <p class="mobile-nav-heading">Properties</p>
+          <a href="listings.html?listing_type=sale">Buy Property</a>
+          <a href="listings.html?listing_type=rent">Rent Property</a>
+          <a href="listings.html?property_type=residential">Residential Homes</a>
+          <a href="listings.html?property_type=land">Land & Plots</a>
+          <a href="listings.html?property_type=commercial">Commercial Spaces</a>
+          <a href="listings.html?listing_type=rent&property_type=residential">Shortlet Apartments</a>
+          <a href="listings.html?verified_only=true" class="mobile-highlight">✓ Verified Listings Only</a>
+        </div>
+
+        <div class="mobile-nav-group">
+          <p class="mobile-nav-heading">Explore & Services</p>
+          <a href="index.html#locations">Area Guide</a>
+          <a href="book-inspection.html">Book an Inspection</a>
+          <a href="mortgage.html">Mortgage Calculator</a>
+          <a href="blog.html">Market News & Blog</a>
+          <a href="trust.html">Trust & Legal Verification</a>
+          <a href="about.html">About Us</a>
+          <a href="contact.html">Contact Us</a>
+          <a href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+        </div>
+      </div>
     </div>
   `;
 
   root.insertAdjacentHTML("afterend", `
-    <nav class="mobile-bottom-nav" aria-label="More pages">
-      <a href="trust.html">Trust and legal</a>
-      <a href="about.html">About us</a>
-      <a href="services.html">Services</a>
-      <a href="listings.html">Properties / listings</a>
-      <a href="agents.html">Agent profile</a>
-      <a href="book-inspection.html">Book an inspection</a>
-      <a href="mortgage.html">Mortgage calculator</a>
-      <a href="faq.html">FAQ</a>
-      <a href="testimonials.html">Testimonials</a>
-      <a href="blog.html">Blog / market news</a>
-      <a href="terms.html">Terms and conditions</a>
-      <a href="privacy.html">Privacy policy</a>
-      <a href="contact.html">Contact us</a>
-      <a href="mailto:admin@dylrealestateservices.com">Contact us by email</a>
-      <a href="tel:+2348000000000">Call customer service</a>
-      <a href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+    <nav class="mobile-bottom-nav" aria-label="Quick links">
+      <a href="index.html">Home</a>
+      <a href="listings.html?listing_type=sale">Buy</a>
+      <a href="listings.html?listing_type=rent">Rent</a>
+      <a href="tel:+2348000000000">Call</a>
+      <a href="dashboard.html">Post</a>
+      <a href="book-inspection.html">Inspection</a>
     </nav>
-    <a class="support-badge" href="https://wa.me/2348000000000?text=${encodeURIComponent("Hello DYL Real-Estate Services, I need assistance.")}" target="_blank" rel="noopener noreferrer"><span class="support-dot"></span> Support</a>
+    <a class="support-badge" href="tel:+2348000000000" title="Call Property Desk"><span class="support-dot"></span> Call Desk</a>
   `);
+
   const actions = document.getElementById("nav-actions");
 
+  function renderActionButtons(user = null) {
+    if (!user) {
+      actions.innerHTML = `
+        <a href="login.html" class="nav-login-link">Log in</a>
+        <a href="dashboard.html" class="btn btn-gold nav-post-btn">
+          <span>Post Property</span>
+        </a>
+      `;
+    } else {
+      actions.innerHTML = `
+        <span class="user-greeting">Hi, ${Util.escapeHtml(user.name.split(" ")[0])}</span>
+        <button class="btn btn-outline nav-logout-btn" id="logout-btn">Log out</button>
+      `;
+      const logoutBtn = document.getElementById("logout-btn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+          Api.clearToken();
+          window.location.href = "index.html";
+        });
+      }
+    }
+  }
+
+  const dropdowns = Array.from(root.querySelectorAll(".nav-dropdown"));
+  const closeDropdowns = () => {
+    dropdowns.forEach((dropdown) => {
+      dropdown.classList.remove("is-open");
+      dropdown.querySelector(".nav-dropdown-btn")?.setAttribute("aria-expanded", "false");
+    });
+  };
+
+  dropdowns.forEach((dropdown) => {
+    const button = dropdown.querySelector(".nav-dropdown-btn");
+    button.addEventListener("click", () => {
+      const shouldOpen = !dropdown.classList.contains("is-open");
+      closeDropdowns();
+      if (shouldOpen) {
+        dropdown.classList.add("is-open");
+        button.setAttribute("aria-expanded", "true");
+      }
+    });
+
+    dropdown.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && dropdown.classList.contains("is-open")) {
+        closeDropdowns();
+        button.focus();
+      }
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!dropdowns.some((dropdown) => dropdown.contains(event.target))) {
+      closeDropdowns();
+    }
+  });
+
+  document.addEventListener("focusin", (event) => {
+    if (!dropdowns.some((dropdown) => dropdown.contains(event.target))) {
+      closeDropdowns();
+    }
+  });
+
+  // Mobile menu drawer toggle
+  const mobileToggle = document.getElementById("mobile-menu-toggle");
+  const mobileDrawer = document.getElementById("mobile-nav-drawer");
+  const mobileBackdrop = document.getElementById("mobile-nav-backdrop");
+  const mobileClose = document.getElementById("mobile-drawer-close");
+
+  const closeMobileMenu = () => {
+    if (mobileDrawer) mobileDrawer.classList.remove("open");
+    if (mobileBackdrop) mobileBackdrop.classList.remove("open");
+    if (mobileToggle) mobileToggle.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+  };
+
+  const openMobileMenu = () => {
+    if (mobileDrawer) mobileDrawer.classList.add("open");
+    if (mobileBackdrop) mobileBackdrop.classList.add("open");
+    if (mobileToggle) mobileToggle.setAttribute("aria-expanded", "true");
+    document.body.style.overflow = "hidden";
+  };
+
+  if (mobileToggle) {
+    mobileToggle.addEventListener("click", () => {
+      if (mobileDrawer && mobileDrawer.classList.contains("open")) {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
+      }
+    });
+  }
+
+  if (mobileClose) mobileClose.addEventListener("click", closeMobileMenu);
+  if (mobileBackdrop) mobileBackdrop.addEventListener("click", closeMobileMenu);
+
   if (!token) {
-    actions.innerHTML = `
-      <a href="login.html" style="font-size:0.85rem;font-weight:500;color:var(--forest-700);">Log in</a>
-      <a href="dashboard.html" class="btn btn-gold">Post Property</a>
-    `;
+    renderActionButtons(null);
     return;
   }
 
   // We have a token — verify it and show the user's name.
   Api.get("/auth/me")
     .then((res) => {
-      document.getElementById("nav-dashboard-link").style.display = "";
-      actions.innerHTML = `
-        <span class="user-greeting">Hi, ${Util.escapeHtml(res.user.name.split(" ")[0])}</span>
-        <button class="btn btn-outline" id="logout-btn" style="padding:0.45rem 0.85rem;">Log out</button>
-      `;
+      const dashboardLink = document.getElementById("nav-dashboard-link");
+      if (dashboardLink) dashboardLink.style.display = "";
+      renderActionButtons(res.user);
       renderUserSettings(res.user);
-      document.getElementById("logout-btn").addEventListener("click", () => {
-        Api.clearToken();
-        window.location.href = "index.html";
-      });
     })
     .catch(() => {
       Api.clearToken();
-      actions.innerHTML = `
-        <a href="login.html" style="font-size:0.85rem;font-weight:500;color:var(--forest-700);">Log in</a>
-        <a href="dashboard.html" class="btn btn-gold">Post Property</a>
-      `;
+      renderActionButtons(null);
     });
 }
 

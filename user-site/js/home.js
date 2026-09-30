@@ -1,6 +1,22 @@
 // Hero search tabs handler
 const tabBtns = document.querySelectorAll("#hero-search-tabs .search-tab-btn");
 const listingTypeInput = document.getElementById("home-search-listing-type");
+const homeSearchForm = document.getElementById("home-search-form");
+const homeMinPrice = document.getElementById("home-search-min-price");
+const homeMaxPrice = document.getElementById("home-search-max-price");
+
+function validateHomePriceRange() {
+  const minPrice = Number(homeMinPrice?.value || 0);
+  const maxPrice = Number(homeMaxPrice?.value || 0);
+  const invalidRange = minPrice > 0 && maxPrice > 0 && minPrice > maxPrice;
+  homeMaxPrice?.setCustomValidity(
+    invalidRange ? "Maximum price must be at least the minimum price." : ""
+  );
+  return !invalidRange;
+}
+
+homeSearchForm?.addEventListener("input", validateHomePriceRange);
+homeSearchForm?.addEventListener("change", validateHomePriceRange);
 
 tabBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -12,14 +28,19 @@ tabBtns.forEach((btn) => {
   });
 });
 
-document.getElementById("home-search-form")?.addEventListener("submit", (e) => {
+homeSearchForm?.addEventListener("submit", (e) => {
   e.preventDefault();
+  if (!validateHomePriceRange()) {
+    homeMaxPrice?.reportValidity();
+    return;
+  }
+
   const q = document.getElementById("home-search-q")?.value.trim() || "";
   const state = document.getElementById("home-search-state")?.value || "";
   const type = document.getElementById("home-search-type")?.value || "";
   const listingType = listingTypeInput?.value || "";
-  const minPrice = document.getElementById("home-search-min-price")?.value || "";
-  const maxPrice = document.getElementById("home-search-max-price")?.value || "";
+  const minPrice = homeMinPrice?.value || "";
+  const maxPrice = homeMaxPrice?.value || "";
   const verifiedOnly = document.getElementById("home-search-verified")?.checked;
 
   const params = new URLSearchParams();

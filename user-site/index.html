@@ -47,48 +47,63 @@
             <input type="hidden" id="home-search-listing-type" value="" />
 
             <div class="search-form-grid">
-              <input type="text" id="home-search-q" placeholder="Search area, city or keyword (e.g. Lekki, Yaba…)" />
+              <label class="search-field search-field-query">
+                <span>Location or keyword</span>
+                <input type="text" id="home-search-q" placeholder="e.g. Enugu, Lekki, Yaba" />
+              </label>
 
-              <select id="home-search-state">
-                <option value="">All States</option>
-                <option value="Enugu">Enugu</option>
-                <option value="Lagos">Lagos</option>
-                <option value="Abuja">Abuja</option>
-                <option value="Ogun">Ogun</option>
-                <option value="Oyo">Oyo</option>
-                <option value="Rivers">Rivers</option>
-              </select>
+              <label class="search-field">
+                <span>State</span>
+                <select id="home-search-state">
+                  <option value="">All States</option>
+                  <option value="Enugu">Enugu</option>
+                  <option value="Lagos">Lagos</option>
+                  <option value="Abuja">Abuja</option>
+                  <option value="Ogun">Ogun</option>
+                  <option value="Oyo">Oyo</option>
+                  <option value="Rivers">Rivers</option>
+                </select>
+              </label>
 
-              <select id="home-search-type">
-                <option value="">All Property Types</option>
-                <option value="residential">Residential</option>
-                <option value="land">Land &amp; Plots</option>
-                <option value="commercial">Commercial</option>
-              </select>
+              <label class="search-field">
+                <span>Property type</span>
+                <select id="home-search-type">
+                  <option value="">All Types</option>
+                  <option value="residential">Residential</option>
+                  <option value="land">Land &amp; Plots</option>
+                  <option value="commercial">Commercial</option>
+                </select>
+              </label>
             </div>
 
             <div class="search-form-grid search-form-row-2">
-              <select id="home-search-min-price">
-                <option value="">Min Price (Any)</option>
-                <option value="1000000">₦1,000,000</option>
-                <option value="5000000">₦5,000,000</option>
-                <option value="10000000">₦10,000,000</option>
-                <option value="25000000">₦25,000,000</option>
-                <option value="50000000">₦50,000,000</option>
-                <option value="100000000">₦100,000,000</option>
-              </select>
+              <label class="search-field">
+                <span>Minimum price</span>
+                <select id="home-search-min-price">
+                  <option value="">No minimum</option>
+                  <option value="1000000">₦1,000,000</option>
+                  <option value="5000000">₦5,000,000</option>
+                  <option value="10000000">₦10,000,000</option>
+                  <option value="25000000">₦25,000,000</option>
+                  <option value="50000000">₦50,000,000</option>
+                  <option value="100000000">₦100,000,000</option>
+                </select>
+              </label>
 
-              <select id="home-search-max-price">
-                <option value="">Max Price (Any)</option>
-                <option value="5000000">₦5,000,000</option>
-                <option value="15000000">₦15,000,000</option>
-                <option value="30000000">₦30,000,000</option>
-                <option value="75000000">₦75,000,000</option>
-                <option value="150000000">₦150,000,000</option>
-                <option value="500000000">₦500,000,000+</option>
-              </select>
+              <label class="search-field">
+                <span>Maximum price</span>
+                <select id="home-search-max-price">
+                  <option value="">No maximum</option>
+                  <option value="5000000">₦5,000,000</option>
+                  <option value="15000000">₦15,000,000</option>
+                  <option value="30000000">₦30,000,000</option>
+                  <option value="75000000">₦75,000,000</option>
+                  <option value="150000000">₦150,000,000</option>
+                  <option value="500000000">₦500,000,000+</option>
+                </select>
+              </label>
 
-              <label class="filter-checkbox" style="height:100%; border:none; background:transparent;">
+              <label class="filter-checkbox search-verified-filter">
                 <input type="checkbox" id="home-search-verified" checked /> Verified Title Only
               </label>
 
@@ -156,54 +171,84 @@
         <a href="listings.html?q=Enugu" class="location-card location-card-featured">
           <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600" alt="Enugu" />
           <div class="location-overlay"></div>
+          <div class="location-badge">Featured Region</div>
           <div class="location-info">
             <h3 class="location-name">Enugu</h3>
             <p class="location-tag">Residential, commercial and verified land</p>
+            <div class="location-meta">
+              <span class="location-count">120+ Listings</span>
+              <span class="location-link-text">Explore area →</span>
+            </div>
           </div>
         </a>
 
         <a href="listings.html?q=Ikeja" class="location-card">
           <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600" alt="Ikeja, Lagos" />
           <div class="location-overlay"></div>
+          <div class="location-badge">High Demand</div>
           <div class="location-info">
-            <h3 class="location-name">Lagos</h3>
+            <h3 class="location-name">Lagos (Ikeja)</h3>
             <p class="location-tag">Capital Commercial Hub &amp; Housing</p>
+            <div class="location-meta">
+              <span class="location-count">340+ Listings</span>
+              <span class="location-link-text">Explore area →</span>
+            </div>
           </div>
         </a>
 
         <a href="listings.html?q=Ikoyi" class="location-card">
           <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600" alt="Ikoyi, Lagos" />
           <div class="location-overlay"></div>
+          <div class="location-badge">Prime Luxury</div>
           <div class="location-info">
             <h3 class="location-name">Ikoyi, Lagos</h3>
             <p class="location-tag">Luxury Apartments &amp; Land Titles</p>
+            <div class="location-meta">
+              <span class="location-count">85+ Listings</span>
+              <span class="location-link-text">Explore area →</span>
+            </div>
           </div>
         </a>
 
         <a href="listings.html?q=Abuja" class="location-card">
           <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=600" alt="Abuja FCT" />
           <div class="location-overlay"></div>
+          <div class="location-badge">Diplomatic Zone</div>
           <div class="location-info">
             <h3 class="location-name">Abuja (FCT)</h3>
             <p class="location-tag">Federal Capital Territory Properties</p>
+            <div class="location-meta">
+              <span class="location-count">210+ Listings</span>
+              <span class="location-link-text">Explore area →</span>
+            </div>
           </div>
         </a>
 
         <a href="listings.html?q=Ogun" class="location-card">
           <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600" alt="Ogun State" />
           <div class="location-overlay"></div>
+          <div class="location-badge">Growing Hub</div>
           <div class="location-info">
             <h3 class="location-name">Ogun State</h3>
             <p class="location-tag">Industrial Lands &amp; New Estates</p>
+            <div class="location-meta">
+              <span class="location-count">95+ Listings</span>
+              <span class="location-link-text">Explore area →</span>
+            </div>
           </div>
         </a>
 
         <a href="listings.html?q=Rivers" class="location-card">
           <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600" alt="Port Harcourt, Rivers" />
           <div class="location-overlay"></div>
+          <div class="location-badge">Coastal Prime</div>
           <div class="location-info">
             <h3 class="location-name">Port Harcourt, Rivers</h3>
             <p class="location-tag">Commercial &amp; Oil Hub Estates</p>
+            <div class="location-meta">
+              <span class="location-count">140+ Listings</span>
+              <span class="location-link-text">Explore area →</span>
+            </div>
           </div>
         </a>
       </div>
